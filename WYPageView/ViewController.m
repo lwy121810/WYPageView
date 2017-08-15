@@ -68,11 +68,11 @@
     //14.边缘标题距离titleView的间距
     config.titleEdgeItemDistanceOfView = 15;
     //15.标题按钮的背景颜色
-    config.titleItemBackgroundColor = [UIColor cyanColor];
+//    config.titleItemBackgroundColor = [UIColor cyanColor];
     //16.titleView的背景颜色
-    config.titleViewBackgroundColor = [UIColor brownColor];
+//    config.titleViewBackgroundColor = [UIColor brownColor];
     //17.下划线的颜色
-    config.downLineColor = [UIColor blueColor];
+    config.downLineColor = [UIColor redColor];
     //18.开启debug mode
     config.onDebug = YES;
     
