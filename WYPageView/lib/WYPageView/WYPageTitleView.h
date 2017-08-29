@@ -15,9 +15,10 @@
  按钮点击事件的代理
 
  @param pageTitleView pageTitleView
- @param index 当前按钮下标
+ @param selectdIndex 当前按钮下标
+ @param oldIndex 上一次点击的按钮下标
  */
-- (void)pageTitleView:(WYPageTitleView *)pageTitleView selectdIndexItem:(NSInteger)index;
+- (void)pageTitleView:(WYPageTitleView *)pageTitleView selectdIndexItem:(NSInteger)selectdIndex oldIndex:(NSInteger)oldIndex;
 
 @end
 @interface WYPageTitleView : UIView

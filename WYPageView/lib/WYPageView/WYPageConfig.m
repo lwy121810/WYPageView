@@ -23,6 +23,8 @@
         
         self.titleFont = [UIFont systemFontOfSize:14];
         
+        self.titleAnimationEnable = YES;
+        
         self.titleAnimationDuration = 0.25;
         
         self.canZoomTitle = NO;
@@ -39,11 +41,15 @@
         
         self.paginationScale = 0.5;
         
-        self.contentScrollAnimated = YES;
+        self.contentAnimationEnable = YES;
         
         self.titleEdgeItemDistanceOfView = 15;
         
         self.titleViewBackgroundColor = [UIColor whiteColor];
+        
+        self.autoCalculateTitleItemWidth = YES;
+        
+        self.itemWidth = 80.f;
     }
     return self;
 }

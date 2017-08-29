@@ -9,9 +9,14 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+//开启debug 开启之后会检查传入的数据（vc是否包含导航栏，vc数量是否与title数量一致等）
+#define WYDEBUG
 
-#define WYDebug
-
+#ifdef WYDEBUG
+#define WYLog(s, ... ) NSLog( @"[%@ in line %d] ===============>%@", [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
+#else
+#define WYLog(s, ... )
+#endif
 
 #undef	RGB
 #define RGB(R,G,B)		[UIColor colorWithRed:R/255.0f green:G/255.0f blue:B/255.0f alpha:1.0f]
@@ -93,14 +98,19 @@
 @property (nonatomic , assign) CGFloat paginationScale;
 
 /**
+ 是否禁止标题点击 YES:标题不响应点击事件，即不能通过点击标题来切换页面 默认为NO
+ */
+@property (nonatomic , assign) BOOL forbidTitleClick;
+
+/**
+ 标题是否有动画效果（滑块移动动画、字体缩放动画）默认‘YES’
+ */
+@property (nonatomic , assign) BOOL titleAnimationEnable;
+
+/**
  标题的动画时间（点击时滑块移动、字体缩放时间）默认‘0.25’
  */
 @property (nonatomic , assign) NSTimeInterval titleAnimationDuration;
-
-/**
- 是否开启debug 默认NO，开启之后会检查传入的数据（vc是否包含导航栏，vc数量是否与title数量一致等）
- */
-@property (nonatomic , assign) BOOL onDebug;
 
 /**
  titleView的边缘按钮距离view的距离 即首个item的x值、最后一个item距离view的间距 默认‘15’
@@ -112,10 +122,24 @@
  */
 @property (nonatomic , assign) BOOL equallySpaceWhenItemsWidthLessThanTitleWidth;
 
+/**
+ 是否自动计算标题item的宽度 YES：自动根据标题文字计算宽度 NO:手动设置item宽度 默认‘YES’
+ */
+@property (nonatomic , assign) BOOL autoCalculateTitleItemWidth;
 
 /**
- contentView的滚动动画
+ 标题item的宽度 只有在‘autoCalculateTitleItemWidth’为‘NO’时有效 默认‘80.f’
  */
-@property (nonatomic , assign) BOOL contentScrollAnimated;
+@property (nonatomic , assign) CGFloat itemWidth;
+
+/**
+ contentView的滚动动画 YES:有滚动动画 NO:无滚动动画 默认‘YES’
+ */
+@property (nonatomic , assign) BOOL contentAnimationEnable;
+
+/**
+ 是否禁止conetentView的滚动 YES：conetentView将不能通过滑动来切换页面，只能通过点击标题切换，默认为NO
+ */
+@property (nonatomic , assign) BOOL forbidContentScroll;
 
 @end

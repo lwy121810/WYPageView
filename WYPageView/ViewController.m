@@ -44,7 +44,7 @@
     //3.是否渐变字体颜色
     config.gradientTitleColor = self.gradientTitleColor.isOn;
     //4.是否有滚动动画
-    config.contentScrollAnimated = self.scrollAnimation.isOn;
+    config.contentAnimationEnable = self.scrollAnimation.isOn;
     //5.当item的总宽度小于pageView的宽度时，item是否等距分布
     config.equallySpaceWhenItemsWidthLessThanTitleWidth = self.equallySpace.on;
     //6.下划线高度
@@ -73,9 +73,9 @@
 //    config.titleViewBackgroundColor = [UIColor brownColor];
     //17.下划线的颜色
     config.downLineColor = [UIColor redColor];
-    //18.开启debug mode
-    config.onDebug = YES;
     
+    
+//    config.forbidContentScroll = YES;
     BOOL isPush = self.isPush.on;
     
     WYPageViewController *vc = [[WYPageViewController alloc] init];
@@ -102,4 +102,5 @@
     
     
 }
+
 @end

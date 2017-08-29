@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class WYPageConetentView;
+@class WYPageConetentView,WYPageConfig;
 @protocol WYPageConetentViewDelegate <NSObject>
 @required
 
@@ -40,26 +40,27 @@
  */
 @property (nonatomic , weak) id<WYPageConetentViewDelegate> delegate;
 
-
 /**
  初始化
 
  @param frame frame
  @param childrenVcs 子控制器数组
  @param parentViewController 父控制器
+ @param config 配置
  @return self
  */
 - (instancetype)initWithFrame:(CGRect)frame
       childrenViewControllers:(NSArray <UIViewController *> *)childrenVcs
-             parentController:(UIViewController *)parentViewController;
+             parentController:(UIViewController *)parentViewController
+                       config:(WYPageConfig *)config;
 
 /**
- 设置内容视图偏移
+ 设置内容视图偏移量
 
- @param contentOffset 偏移量
+ @param index 偏移量
  @param animated animated
  */
-- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated;
+- (void)setContentOffsetWithCurrentIndex:(NSInteger)index animated:(BOOL)animated;
 
 
 /**

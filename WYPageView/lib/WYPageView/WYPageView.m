@@ -44,7 +44,7 @@
         CGFloat contentH = self.frame.size.height - contentY;
         CGRect frame = CGRectMake(0, contentY, self.frame.size.width, contentH);
         
-        WYPageConetentView *contentView = [[WYPageConetentView alloc] initWithFrame:frame childrenViewControllers:self.childVcs parentController:self.parentViewController];
+        WYPageConetentView *contentView = [[WYPageConetentView alloc] initWithFrame:frame childrenViewControllers:self.childVcs parentController:self.parentViewController config:self.config];
         
         [self addSubview:contentView];
         contentView.delegate = self;
@@ -62,7 +62,7 @@
     return self;
 }
 - (void)dealloc {
-    NSLog(@"WYPageView--销毁");
+    WYLog(@"WYPageView--销毁");
 }
 - (instancetype)initWithFrame:(CGRect)frame
                      childVcs:(NSArray *)childVcs
@@ -180,12 +180,11 @@
 {
     if (childVcs == nil || childVcs.count == 0) return;
     if (titles == nil || titles.count == 0) return;
-    
-    if (self.config.onDebug) {
-        if (childVcs.count != titles.count) {
-            NSAssert(NO, @"WYPageView==========>>>>>>>>标题数量与子控制器数量不一致");
-        }
+#ifdef WYDEBUG
+    if (childVcs.count != titles.count) {
+        NSAssert(NO, @"WYPageView==========>>>>>>>>标题数量与子控制器数量不一致");
     }
+#endif
     
     self.childVcs = childVcs;
     self.titlesArray = titles;
@@ -222,14 +221,15 @@
 - (void)setupDataWithHaveTitles:(BOOL)haveTitles {
     NSMutableArray *tempTitles = [NSMutableArray array];
     for (UIViewController *childVc in self.childVcs) {
-        if (self.config.onDebug) {//开启debug
-            if ([childVc isKindOfClass:[UINavigationController class]]) {
-                NSAssert(NO, @"WYPageView==========>>>>>>>>不要添加含有导航栏的子控制器！");
-            }
-            if (haveTitles == NO) {//标题与vc一起传进来的 获取vc的标题
-                NSAssert(childVc.title, @"WYPageView==========>>>>>>>>子控制器的title没有正确设置!!");
-            }
+#ifdef WYDEBUG
+        if ([childVc isKindOfClass:[UINavigationController class]]) {
+            NSAssert(NO, @"WYPageView==========>>>>>>>>不要添加含有导航栏的子控制器！");
         }
+        if (haveTitles == NO) {//标题与vc一起传进来的 获取vc的标题
+            NSAssert(childVc.title, @"WYPageView==========>>>>>>>>子控制器的title没有正确设置!!");
+        }
+#endif
+        
         if (haveTitles == NO) {//标题与vc一起传进来的 获取vc的标题
             if (childVc.title) {
                 [tempTitles addObject:childVc.title];
@@ -241,12 +241,9 @@
         self.titlesArray = [NSArray arrayWithArray:tempTitles];
     }
   
-    if (self.titlesArray.count != self.childVcs.count) {
-        if (self.config.onDebug) {
-            NSAssert(NO, @"WYPageView==========>>>>>>>>标题数量与子控制器数量不一致");
-        }
-    }
-
+#ifdef WYDEBUG
+    NSAssert(self.titlesArray.count == self.childVcs.count, @"WYPageView==========>>>>>>>>标题数量与子控制器数量不一致");
+#endif
 }
 - (void)setupView
 {
@@ -255,10 +252,15 @@
 }
 
 #pragma mark - WYPageTitleViewDelegate
-- (void)pageTitleView:(WYPageTitleView *)pageTitleView selectdIndexItem:(NSInteger)index
+- (void)pageTitleView:(WYPageTitleView *)pageTitleView selectdIndexItem:(NSInteger)selectdIndex oldIndex:(NSInteger)oldIndex
 {
-    BOOL animated = self.config.contentScrollAnimated;
-    [self.contentView setContentOffset:CGPointMake(index * self.contentView.frame.size.width, 0) animated:animated];
+    BOOL animated = self.config.contentAnimationEnable;
+    int difference = abs((int)selectdIndex - (int)oldIndex);
+    if (animated) {
+        //当点击的item不相邻的时候 不显示滚动效果
+        animated = difference <= 1;
+    }
+    [self.contentView setContentOffsetWithCurrentIndex:selectdIndex animated:animated];
 }
 
 #pragma mark - WYPageConetentViewDelegate

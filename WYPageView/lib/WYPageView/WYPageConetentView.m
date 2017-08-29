@@ -7,11 +7,14 @@
 //
 
 #import "WYPageConetentView.h"
+#import "WYPageConfig.h"
 
-static NSString *identifier = @"WYNavManagerCell";
-@interface WYPageConetentView ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate>
-@property (nonatomic , weak) UICollectionView *collectionView;
-@property (nonatomic , weak) UICollectionViewFlowLayout *flowLayout;
+@interface WYPageConetentView ()<UIScrollViewDelegate>
+{
+    NSInteger _currentIndex;
+}
+@property (nonatomic , strong) NSMutableDictionary<NSNumber*,UIViewController *> *displayChildVcData;
+@property (nonatomic , strong) UIScrollView *scrollView;
 
 @property (nonatomic , strong) NSMutableArray *viewControllers;
 
@@ -26,8 +29,35 @@ static NSString *identifier = @"WYNavManagerCell";
  */
 @property (nonatomic , assign) CGFloat startOffsetX;
 
+
+@property (nonatomic , strong) WYPageConfig *config;
+
 @end
 @implementation WYPageConetentView
+- (NSMutableDictionary<NSNumber *,UIViewController *> *)displayChildVcData
+{
+    if (!_displayChildVcData) {
+        _displayChildVcData = [NSMutableDictionary dictionary];
+    }
+    return _displayChildVcData;
+}
+
+
+- (UIScrollView *)scrollView
+{
+    if (!_scrollView) {
+        UIScrollView *scrollView = [[UIScrollView alloc] init];
+        [self addSubview:scrollView];
+        scrollView.showsVerticalScrollIndicator = NO;
+        scrollView.showsHorizontalScrollIndicator = NO;
+        scrollView.delegate = self;
+        scrollView.pagingEnabled = YES;
+        scrollView.bounces = NO;
+        _scrollView = scrollView;
+    }
+    return _scrollView;
+}
+
 - (NSMutableArray *)viewControllers
 {
     if (!_viewControllers) {
@@ -36,36 +66,15 @@ static NSString *identifier = @"WYNavManagerCell";
     }
     return _viewControllers;
 }
-- (UICollectionView *)collectionView
-{
-    if (!_collectionView) {
-        UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        flowLayout.minimumLineSpacing = 0;
-        flowLayout.minimumInteritemSpacing = 0;
-        [flowLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
-        UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:flowLayout];
-        collectionView.delegate = self;
-        collectionView.dataSource = self;
-        [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:identifier];
-        collectionView.pagingEnabled = YES;
-        collectionView.bounces = NO;
-        collectionView.contentInset = UIEdgeInsetsZero;
-        collectionView.backgroundColor = [UIColor whiteColor];
-        [self addSubview:collectionView];
-        self.flowLayout = flowLayout;
-        self.collectionView = collectionView;
-    }
-    return _collectionView;
-}
-
 - (instancetype)initWithFrame:(CGRect)frame
       childrenViewControllers:(NSArray <UIViewController *> *)childrenVcs
              parentController:(UIViewController *)parentViewController
+                       config:(WYPageConfig *)config
 {
     if (self = [super initWithFrame:frame]) {
         self.viewControllers = [childrenVcs mutableCopy];
         self.parentController = parentViewController;
-        
+        self.config = config;
         [self setupView];
     }
     return self;
@@ -73,21 +82,95 @@ static NSString *identifier = @"WYNavManagerCell";
 
 - (void)setupView
 {
-    //1.设置collectionView的frame
-    self.collectionView.frame = self.bounds;
     
-    //2.设置子控制器
-    [self.viewControllers enumerateObjectsUsingBlock:^(UIViewController *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (self.parentController) {
-            [self.parentController addChildViewController:obj];
-        }
-    }];
+    self.scrollView.frame = self.bounds;
+    
+    CGFloat contentSize = self.viewControllers.count * self.scrollView.frame.size.width;
+    
+    self.scrollView.contentSize = CGSizeMake(contentSize, 0);
+    
+    _currentIndex = 0;
+    
+    self.scrollView.scrollEnabled = !self.config.forbidContentScroll;
+    
+    UIViewController *firstVc = [self getChildrenControllerWithIndex:0];
+    
+    [self addChildViewController:firstVc atIndex:0];
 }
+/**
+ 移除控制器，且从display中移除
+ 
+ @param viewController 子控制器
+ @param index 下标
+ */
+- (void)removeChildViewController:(UIViewController *)viewController atIndex:(NSInteger)index {
+    if (viewController == nil) return;
+    [viewController.view removeFromSuperview];
+    [viewController willMoveToParentViewController:nil];
+    [viewController removeFromParentViewController];
+    [self.displayChildVcData removeObjectForKey:@(index)];
+}
+
 #pragma mark - public method
-- (void)setContentOffset:(CGPoint)contentOffset animated:(BOOL)animated
+- (void)setContentOffsetWithCurrentIndex:(NSInteger)index animated:(BOOL)animated
 {
     _isForbidScrollDelegate = YES;
-    [self.collectionView setContentOffset:contentOffset animated:animated];
+    
+    CGFloat offset = index * self.scrollView.frame.size.width;
+    
+    [self.scrollView setContentOffset:CGPointMake(offset, 0) animated:animated];
+    
+    UIViewController *subVc = [self getChildrenControllerWithIndex:index];
+    
+    [self addChildViewController:subVc atIndex:index];
+    
+    if (animated) return;
+    // 没有动画
+    // 移除上一个控制器
+    UIViewController *currentViewController = self.displayChildVcData[@(_currentIndex)];
+    if (currentViewController) {
+        [self removeChildViewController:currentViewController atIndex:_currentIndex];
+    }
+    
+    //标记当前的下标
+    _currentIndex = index;
+}
+
+/**
+ 子控制器从父控制器移除
+ 
+ @param childController 子控制器
+ */
+- (void)childControllerRemoveFromParentViewController:(UIViewController *)childController
+{
+    if (childController.isViewLoaded) {
+        [childController.view removeFromSuperview];
+        [childController willMoveToParentViewController:nil];
+        [childController removeFromParentViewController];
+    }
+}
+
+/**
+ 添加子控制器
+ 
+ @param childController 子控制器
+ @param index 下标
+ */
+- (void)addChildViewController:(UIViewController *)childController atIndex:(NSInteger)index
+{
+    if (self.parentController == nil) return;
+    if (childController == nil) return;
+    
+    [self.parentController addChildViewController:childController];
+    
+    CGRect frame = self.scrollView.frame;
+    frame.origin.x = index * self.scrollView.frame.size.width;
+    childController.view.frame = frame;
+    
+    [childController didMoveToParentViewController:self.parentController];
+    [self.scrollView addSubview:childController.view];
+    
+    [self.displayChildVcData setObject:childController forKey:[NSNumber numberWithInteger:index]];
 }
 
 /**
@@ -100,30 +183,40 @@ static NSString *identifier = @"WYNavManagerCell";
     
     [self.viewControllers enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([obj isKindOfClass:[UIViewController class]]) {
-            UIViewController *vc = (UIViewController *)obj;
-            [vc willMoveToParentViewController:nil];
-            [vc.view removeFromSuperview];
-            [vc removeFromParentViewController];
+            [self childControllerRemoveFromParentViewController:obj];
         }
     }];
+    
+    [self.displayChildVcData removeAllObjects];
     
     [self.viewControllers removeAllObjects];
     
     [self.viewControllers addObjectsFromArray:childVcs];
     
+    [self removeAllSubViewsWithSuperView:self.scrollView];
+    
+    [self.scrollView setContentOffset:CGPointMake(0, 0)];
+    
     [self setupView];
-    
-    [self.collectionView reloadData];
-    
-    [self.collectionView setContentOffset:CGPointMake(0, 0)];
 }
-
+- (void)removeAllSubViewsWithSuperView:(UIView *)superView
+{
+    if (superView == nil || superView.subviews.count == 0) return;
+    
+    [superView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+}
 - (void)dealloc {
-    self.parentController = nil;
-    NSLog(@"WYPageContentView---销毁");
+    WYLog(@"WYPageContentView---销毁");
 }
 
 #pragma mark - private
+
+/**
+ 获取当前下标
+
+ @param scrollView scrollView
+ @return index
+ */
 - (NSInteger)getCurrentIndex:(UIScrollView *)scrollView
 {
     if (scrollView.frame.size.width == 0 || scrollView.frame.size.height == 0) return 0;
@@ -185,10 +278,20 @@ static NSString *identifier = @"WYNavManagerCell";
         }
     }
     
+    [self fixChildrenViewControllerWithSourceIndex:sourceIndex targetIndex:targetIndex];
+    
     if (_delegate && [_delegate respondsToSelector:@selector(pageContentView:scrollWithProgress:sourceIndex:targetIndex:)]) {
         [_delegate pageContentView:self scrollWithProgress:progress sourceIndex:sourceIndex targetIndex:targetIndex];
     }
 }
+- (void)fixChildrenViewControllerWithSourceIndex:(NSInteger)sourceIndex targetIndex:(NSInteger)targetIndex
+{
+    if (_currentIndex == targetIndex) return;
+    _currentIndex = targetIndex;
+    UIViewController *targetController = [self getChildrenControllerWithIndex:targetIndex];
+    [self addChildViewController:targetController atIndex:targetIndex];
+}
+
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
     //标记不是点击事件
@@ -200,43 +303,37 @@ static NSString *identifier = @"WYNavManagerCell";
 //滑动停止
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    //1.滑动停止，跟开始滑动的偏移量一致 说明还停留在当前页
-    if (_startOffsetX == scrollView.contentOffset.x) return;
-    
+    //1.获取当前下标
     NSInteger currentIndex = [self getCurrentIndex:scrollView];
     
+    //2.移除其他vc
+    NSDictionary *childData = self.displayChildVcData;
+    [childData enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull key, UIViewController * _Nonnull obj, BOOL * _Nonnull stop) {
+        if (![key isEqual:@(currentIndex)]) {
+            [self removeChildViewController:obj atIndex:[key integerValue]];
+        }
+    }];
+    
+    //3.滑动停止，跟开始滑动的偏移量一致 说明还停留在当前页
+    if (_startOffsetX == scrollView.contentOffset.x) return;
+    
+    //4.代理
     if (_delegate && [_delegate respondsToSelector:@selector(scrollViewDidEndAtIndex:)]) {
         [_delegate scrollViewDidEndAtIndex:currentIndex];
     }
-}
-
-
-#pragma mark - UICollectionViewDelegate
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-    return self.viewControllers.count;
-}
-
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    CGFloat w = self.bounds.size.width;
-    CGFloat h = collectionView.bounds.size.height - self.flowLayout.minimumInteritemSpacing - collectionView.contentInset.top - collectionView.contentInset.bottom;
-    CGSize size = CGSizeMake(w, h);
-    return size;
-}
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
     
-    [cell.contentView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    
-    UIViewController *subVc = [self getChildrenControllerWithIndex:indexPath.row];
-    subVc.view.frame = cell.contentView.bounds;
-    [cell.contentView addSubview:subVc.view];
-    
-    [subVc didMoveToParentViewController:self.parentController];
-    return cell;
+}
+#pragma mark - scrollView动画结束之后
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
+{
+    //点击标题 scrollView动画结束之后 移除上一个控制器
+    UIViewController *currentViewController = self.displayChildVcData[@(_currentIndex)];
+    if (currentViewController) {
+        [self removeChildViewController:currentViewController atIndex:_currentIndex];
+    }
+    NSInteger index = [self getCurrentIndex:scrollView];
+    //标记当前的下标
+    _currentIndex = index;
 }
 
 /**
@@ -263,7 +360,7 @@ static NSString *identifier = @"WYNavManagerCell";
  */
 - (NSInteger)getCurrentControllerIndex
 {
-    return [self getCurrentIndex:self.collectionView];
+    return [self getCurrentIndex:self.scrollView];
 }
 
 /**

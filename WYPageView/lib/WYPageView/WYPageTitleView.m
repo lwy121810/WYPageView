@@ -126,8 +126,6 @@ typedef struct {
     _currentIndex = 0;
     
     if (self.config.gradientTitleColor) {//字体颜色渐变
-//        WYRGBNumber selectedColor = [self getRGBWithColor:self.config.selectedTitleColor];
-//        WYRGBNumber normalColor = [self getRGBWithColor:self.config.normalTitleColor];
         WYRGBNumber selectedColor = [self getRGBColor:self.config.selectedTitleColor];
         WYRGBNumber normalColor = [self getRGBColor:self.config.normalTitleColor];
         if (selectedColor.isRGB == NO) {//转化rgb失败
@@ -173,9 +171,9 @@ typedef struct {
 //        WYRGBNumber color = {components[0],components[1],components[2], YES};
 //        return color;
 //    }
-//    if (self.config.onDebug) {
-//         NSAssert(NO, @"WYPageTitleView==========>>>>>>>>设置字体颜色时应该使用具有rgb颜色空间的color");
-//    }
+//#ifdef WYDEBUG
+//    NSAssert(NO, @"WYPageTitleView==========>>>>>>>>设置字体颜色时应该使用具有rgb颜色空间的color");
+//#endif
 //    return (WYRGBNumber){0.0,0.0,0.0, NO};
 //}
 
@@ -223,10 +221,15 @@ typedef struct {
     __block UIButton *lastView = nil;
     
     __block CGFloat itemTotalWidth = 0.0;
-    
+    __block CGFloat w = 0;
+    if (!self.config.autoCalculateTitleItemWidth) {
+        w = self.config.itemWidth;
+    }
     [self.titles enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         //0.计算宽度
-        CGFloat w = [self getTitleWidth:obj];
+        if (self.config.autoCalculateTitleItemWidth) {
+            w = [self getTitleWidth:obj];
+        }
         //1.创建
         UIButton *button = [self createButtonWithTitle:obj tag:(idx + 1000)];
         //2.设置frame
@@ -331,6 +334,8 @@ typedef struct {
 #pragma mark - buttn按钮的点击事件
 - (void)buttonAction:(UIButton *)sender
 {
+    //0.是否禁止点击
+    if (self.config.forbidTitleClick) return;
     //1.取出下标
     NSInteger index = sender.tag - 1000;
     //2.点击的同一个 直接返回
@@ -364,36 +369,56 @@ typedef struct {
     //6.变化字体
     if (self.config.canZoomTitle) {
         CGFloat zoom = self.config.titleZoomMultiple;
-        NSTimeInterval duration = self.config.titleAnimationDuration;
-        [UIView animateWithDuration:duration animations:^{
+        if (self.config.titleAnimationEnable) {//有动画
+            NSTimeInterval duration = self.config.titleAnimationDuration;
+            if (duration > 0.0) {//动画时间大于0
+                [UIView animateWithDuration:duration animations:^{
+                    oldBtn.transform = CGAffineTransformMakeScale(1.0, 1.0);
+                    sender.transform = CGAffineTransformMakeScale(zoom, zoom);
+                }];
+            }
+            else {// 动画时间小于0，即没有动画
+                oldBtn.transform = CGAffineTransformMakeScale(1.0, 1.0);
+                sender.transform = CGAffineTransformMakeScale(zoom, zoom);
+            }
+        }
+        else {//无动画
             oldBtn.transform = CGAffineTransformMakeScale(1.0, 1.0);
             sender.transform = CGAffineTransformMakeScale(zoom, zoom);
-        }];
+        }
+    
     }
     //7. 调整滑块位置
     if (self.config.showLine) {
-        NSTimeInterval duration = self.config.titleAnimationDuration;
-        if (self.config.canZoomTitle) {
-            [UIView animateWithDuration:duration animations:^{
-                [self resetDownLineWithSender:sender];
-            }];
+        if (self.config.titleAnimationEnable) {
+            NSTimeInterval duration = self.config.titleAnimationDuration;
+            if (duration > 0.0) {
+                [UIView animateWithDuration:duration animations:^{
+                    [self resetDownLineWithSender:sender];
+                }];
+            }
+            else {
+               [self resetDownLineWithSender:sender];
+            }
         }
         else {
-            [UIView animateWithDuration:duration animations:^{
-                 [self resetDownLineWithSender:sender];
-            }];
+            [self resetDownLineWithSender:sender];
         }
     }
     //8.记录当前item
     if (self.config.gradientTitleColor == NO) {//不渐变字体颜色
+        //记录当前的item
         _currentItem = sender;
     }
+    
+    
     //9.记录当前item的index
+    NSInteger oldIndex = _currentIndex;
     _currentIndex = index;
     
     //10. 代理
-    if (_delegate && [_delegate respondsToSelector:@selector(pageTitleView:selectdIndexItem:)]) {
-        [_delegate pageTitleView:self selectdIndexItem:_currentIndex];
+    if (_delegate && [_delegate respondsToSelector:@selector(pageTitleView:selectdIndexItem:oldIndex:)]) {
+        [_delegate pageTitleView:self selectdIndexItem:_currentIndex oldIndex:oldIndex];
     }
 }
 

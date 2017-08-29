@@ -7,6 +7,12 @@
 //
 
 #import "WYPageViewController.h"
+#import "OneViewController.h"
+#import "TwoViewController.h"
+#import "ThreeViewController.h"
+#import "FourViewController.h"
+#import "FiveViewController.h"
+#import "SixViewController.h"
 
 @interface WYPageViewController ()
 
@@ -29,12 +35,17 @@
     }
     frame.origin.y = y;
     
+    
+    
     WYPageView *view = [[WYPageView alloc] initWithFrame:frame childVcs:vcs parentViewController:self pageConfig:_config];
     [self.view addSubview:view];
     self.pageView = view;
     
-    UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithTitle:@"reload" style:UIBarButtonItemStyleDone target:self action:@selector(rightAction)];
-    self.navigationItem.rightBarButtonItem = right;
+    UIBarButtonItem *right1 = [[UIBarButtonItem alloc] initWithTitle:@"随机" style:UIBarButtonItemStyleDone target:self action:@selector(randomReloadAction)];
+    
+    UIBarButtonItem *right2 = [[UIBarButtonItem alloc] initWithTitle:@"其他" style:UIBarButtonItemStyleDone target:self action:@selector(otherAction)];
+    
+    self.navigationItem.rightBarButtonItems = @[right1, right2];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap)];
     [self.view addGestureRecognizer:tap];
@@ -49,22 +60,50 @@
 {
     NSLog(@"dealloc------");
 }
-- (void)rightAction
+- (void)otherAction
 {
+    NSMutableArray *childs = @[].mutableCopy;
+    OneViewController *vc1 = [[OneViewController alloc] init];
+    vc1.title = @"vc1";
+    [childs addObject:vc1];
     
-    NSMutableArray *viewCs = [NSMutableArray array];
+    TwoViewController *vc2 = [[TwoViewController alloc] init];
+    vc2.title = @"vc2";
+    [childs addObject:vc2];
+    
+    ThreeViewController *vc3 = [[ThreeViewController alloc] init];
+    vc3.title = @"vc3";
+    [childs addObject:vc3];
+    
+    FourViewController *vc4 = [[FourViewController alloc] init];
+    vc4.title = @"vc4";
+    [childs addObject:vc4];
+    
+    FiveViewController *vc5 = [[FiveViewController alloc] init];
+    vc5.title = @"vc5";
+    [childs addObject:vc5];
+    
+    SixViewController *vc6 = [[SixViewController alloc] init];
+    vc6.title = @"vc6";
+    [childs addObject:vc6];
+    
+    [self.pageView reloadChildrenControllers:childs];
+}
+- (void)randomReloadAction
+{
+    NSMutableArray *vcs = [NSMutableArray array];
     NSMutableArray *titles = [NSMutableArray array];
     
-    NSInteger count = arc4random() % 8 + 4;
+    NSInteger count = arc4random() % 8 + 3;
     for (int i = 0; i < count; i++) {
         UIViewController *contentVc = [[UIViewController alloc] init];
         NSString *title = [NSString stringWithFormat:@"标题%d", i];
-        [viewCs addObject:contentVc];
+        [vcs addObject:contentVc];
         contentVc.view.backgroundColor = [self randomColor];
         [titles addObject:title];
     }
     
-    [self.pageView reloadChildrenControllers:viewCs titles:titles];
+    [self.pageView reloadChildrenControllers:vcs titles:titles];
 }
 
 - (UIColor *)randomColor {
@@ -106,6 +145,8 @@
     UIViewController *vc8 = [UIViewController new];
     vc8.view.backgroundColor = [UIColor blueColor];
     vc8.title = @"易城live";
+    
+    
     
     NSArray *childVcs = [NSArray arrayWithObjects:vc1, vc2, vc3, vc4, vc5, vc6, vc7,vc8,nil];
     return childVcs;
