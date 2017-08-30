@@ -26,14 +26,71 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *isPush;
 
+@property (weak, nonatomic) IBOutlet UISwitch *lineWidthEqualToItemSwitch;
+
+
+@property (weak, nonatomic) IBOutlet UISwitch *lineScrollNoneSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *lineScrollValue1Switch;
+@property (weak, nonatomic) IBOutlet UISwitch *lineScrollValue2Switch;
+
+@property (nonatomic , assign) WYDownLineScrollAnimation currentAnimation;
 
 @end
 
 @implementation ViewController
+
+- (IBAction)lineAnimationNone:(UISwitch *)sender {
+    sender.on = !sender.on;
+    if (sender.on) {
+        self.currentAnimation = WYDownLineScrollAnimationNone;
+        
+        self.lineScrollValue1Switch.on = NO;
+    }
+    else {
+        self.lineScrollValue1Switch.on = YES;
+        self.currentAnimation = WYDownLineScrollAnimationDefault;
+    }
+   
+    self.lineScrollValue2Switch.on = NO;
+}
+- (IBAction)lineAnimationValue1:(UISwitch *)sender {
+    
+    if (self.lineScrollValue2Switch.on == NO && self.lineScrollNoneSwitch.on == NO) {
+        sender.on = YES;
+        return;
+    }
+    sender.on = !sender.on;
+    
+    self.currentAnimation = WYDownLineScrollAnimationDefault;
+    
+    self.lineScrollNoneSwitch.on = NO;
+    self.lineScrollValue2Switch.on = NO;
+}
+
+- (IBAction)lineAnimationValue2:(UISwitch *)sender {
+    
+    sender.on = !sender.on;
+    
+    if (sender.on) {
+        self.currentAnimation = WYDownLineScrollAnimationValue2;
+        self.lineScrollValue1Switch.on = NO;
+    }
+    else {
+        
+        self.lineScrollValue1Switch.on = YES;
+        self.currentAnimation = WYDownLineScrollAnimationDefault;
+    }
+    
+    self.lineScrollNoneSwitch.on = NO;
+}
+
+
+
 - (IBAction)push:(id)sender {
     [self.view endEditing:YES];
     [self nextVc];
 }
+#pragma mark - 跳转到下一个页面
 - (void)nextVc
 {
     WYPageConfig *config = [[WYPageConfig alloc] init];
@@ -74,8 +131,11 @@
     //17.下划线的颜色
     config.downLineColor = [UIColor redColor];
     
+    //18. 动画效果
+    config.downLineScrollAnimation = _currentAnimation;
     
-//    config.forbidContentScroll = YES;
+    //19. 滑块宽度是否等于标题宽度
+    config.downLineWidthEqualToItemWidth = self.lineWidthEqualToItemSwitch.on;
     BOOL isPush = self.isPush.on;
     
     WYPageViewController *vc = [[WYPageViewController alloc] init];
@@ -100,7 +160,13 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    self.lineScrollValue1Switch.on = YES;
+    self.lineScrollNoneSwitch.on = NO;
+    self.lineScrollValue2Switch.on = NO;
     
+    self.lineWidthEqualToItemSwitch.on = NO;
+    
+    _currentAnimation = WYDownLineScrollAnimationDefault;
 }
 
 @end

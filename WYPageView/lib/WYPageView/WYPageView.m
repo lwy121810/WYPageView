@@ -121,7 +121,7 @@
 
 /**
  获取控制器所在的下标
-
+ 
  @param vc 控制器
  @return 下标
  */
@@ -156,7 +156,7 @@
 
 /**
  刷新页面数据 子控制器需要有标题
-
+ 
  @param childVcs 子控制器
  */
 - (void)reloadChildrenControllers:(NSArray *)childVcs
@@ -172,7 +172,7 @@
 
 /**
  刷新页面数据 子控制器和标题数组分开传递
-
+ 
  @param childVcs 子控制器
  @param titles 标题数组
  */
@@ -240,7 +240,7 @@
     if (haveTitles == NO) {//标题与vc一起传进来的 获取vc的标题
         self.titlesArray = [NSArray arrayWithArray:tempTitles];
     }
-  
+    
 #ifdef WYDEBUG
     NSAssert(self.titlesArray.count == self.childVcs.count, @"WYPageView==========>>>>>>>>标题数量与子控制器数量不一致");
 #endif

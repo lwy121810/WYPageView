@@ -19,6 +19,12 @@
         
         self.downLineColor = [UIColor redColor];
         
+        self.downLineWidthEqualToItemWidth = YES;
+        
+        self.downLineWidth = 30.0;
+        
+        self.downLineScrollAnimation = WYDownLineScrollAnimationDefault;
+        
         self.titleMargin = 15;
         
         self.titleFont = [UIFont systemFontOfSize:14];
@@ -48,6 +54,8 @@
         self.titleViewBackgroundColor = [UIColor whiteColor];
         
         self.autoCalculateTitleItemWidth = YES;
+        
+        self.contentScrollEnabled = YES;
         
         self.itemWidth = 80.f;
     }

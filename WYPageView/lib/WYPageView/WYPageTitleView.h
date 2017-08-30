@@ -49,7 +49,7 @@
 
 
 /**
- 设置mainView的偏移量
+ 设置mainView的偏移量 contentView滚动结束后调用
 
  @param currentIndex 下标
  */

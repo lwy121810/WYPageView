@@ -42,7 +42,6 @@
     return _displayChildVcData;
 }
 
-
 - (UIScrollView *)scrollView
 {
     if (!_scrollView) {
@@ -91,7 +90,7 @@
     
     _currentIndex = 0;
     
-    self.scrollView.scrollEnabled = !self.config.forbidContentScroll;
+    self.scrollView.scrollEnabled = self.config.contentScrollEnabled;
     
     UIViewController *firstVc = [self getChildrenControllerWithIndex:0];
     
@@ -213,7 +212,7 @@
 
 /**
  获取当前下标
-
+ 
  @param scrollView scrollView
  @return index
  */
@@ -241,7 +240,7 @@
     CGFloat currentOffsetX = scrollView.contentOffset.x;
     BOOL isSlipToRightPage = YES;
     if (_startOffsetX < currentOffsetX) {//左滑
-        //0.标记滑动方向
+        // 0.标记滑动方向
         isSlipToRightPage = YES;
         
         // 1.计算progress floor函数是取整
@@ -263,7 +262,7 @@
         
     }
     else {//右滑
-        //0.标记滑动方向
+        // 0.标记滑动方向
         isSlipToRightPage = NO;
         // 1.计算progress
         progress = 1 - (currentOffsetX / scrollViewW - floor(currentOffsetX / scrollViewW));
@@ -338,7 +337,7 @@
 
 /**
  获取子控制器
-
+ 
  @param index index
  @return 子控制器
  */
@@ -355,7 +354,7 @@
 
 /**
  获取当前控制器所在下标
-
+ 
  @return index
  */
 - (NSInteger)getCurrentControllerIndex
@@ -365,7 +364,7 @@
 
 /**
  获取当前的控制器
-
+ 
  @return vc
  */
 - (UIViewController *)getCurrentController

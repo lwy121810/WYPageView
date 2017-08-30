@@ -96,7 +96,7 @@ typedef struct {
 }
 /**
  初始化
-
+ 
  @param frame frame
  @param titles 标题数组
  @return self
@@ -147,7 +147,7 @@ typedef struct {
 
 /**
  根据rgb获取颜色
-
+ 
  @param rgb rgb
  @return color
  */
@@ -158,7 +158,7 @@ typedef struct {
 
 /**
  根据颜色获取rgb值 此方法只能获取rgb空间的颜色值，其他的获取不到（grayColor），因此改用下面的方法
-
+ 
  @param color color
  @return rgb
  */
@@ -179,7 +179,7 @@ typedef struct {
 
 /**
  根据颜色获取rgb值
-
+ 
  @param color color
  @return rgb value
  */
@@ -269,13 +269,31 @@ typedef struct {
     }];
     
     if (self.config.showLine) {//显示滑块
-        self.downLine.frame = CGRectMake(firstX, self.bounds.size.height - self.config.downLineHeight, self.itemArray.firstObject.frame.size.width, self.config.downLineHeight);
+        CGFloat lineW = 0;
+        CGFloat originX = 0;
+        if (self.config.downLineWidthEqualToItemWidth) {
+            lineW = self.itemArray.firstObject.frame.size.width;
+            originX = firstX;
+        }
+        else {
+            lineW = self.config.downLineWidth;
+            originX = self.itemArray.firstObject.center.x - lineW * 0.5;
+        }
+        self.downLine.frame = CGRectMake(originX, self.bounds.size.height - self.config.downLineHeight, lineW, self.config.downLineHeight);
     }
     
-    if (self.config.canZoomTitle && self.config.showLine) {
-        [self resetDownLineWithSender:self.itemArray.firstObject];
+    if (self.config.canZoomTitle && self.config.showLine) {// 如果缩放了字体 重新调整滑块
+        if (self.config.downLineWidthEqualToItemWidth) {//滑块宽度等于按钮宽度
+            [self resetDownLineWithSender:self.itemArray.firstObject];
+        }
+        else {//手动设置滑块宽度
+            // 调整滑块中心点等于按钮的中心点
+            CGPoint center = self.downLine.center;
+            center.x = self.itemArray.firstObject.center.x;
+            self.downLine.center = center;
+        }
     }
-  
+    
     CGFloat contentW = CGRectGetMaxX(lastView.frame) + firstX;
     //设置等距分布
     if (self.config.equallySpaceWhenItemsWidthLessThanTitleWidth) {
@@ -296,7 +314,7 @@ typedef struct {
 
 /**
  重新设置item的间距
-
+ 
  @param margin 间距
  */
 - (void)resetItemMargin:(CGFloat)margin
@@ -317,7 +335,7 @@ typedef struct {
 }
 /**
  根据标题获取宽度
-
+ 
  @param title 标题
  @return 标题宽度
  */
@@ -350,11 +368,11 @@ typedef struct {
     UIColor *selectColor = self.config.selectedTitleColor;
     [sender setTitleColor:selectColor forState:UIControlStateNormal];
     
-
+    
     //5.设置mainView的偏移量
     //5.1 计算开始偏移的最小值
     CGFloat paginationOrigin = self.mainView.frame.size.width * self.config.paginationScale;
-
+    
     //5.2 计算center
     CGFloat centerX = sender.center.x;
     
@@ -386,7 +404,7 @@ typedef struct {
             oldBtn.transform = CGAffineTransformMakeScale(1.0, 1.0);
             sender.transform = CGAffineTransformMakeScale(zoom, zoom);
         }
-    
+        
     }
     //7. 调整滑块位置
     if (self.config.showLine) {
@@ -398,7 +416,7 @@ typedef struct {
                 }];
             }
             else {
-               [self resetDownLineWithSender:sender];
+                [self resetDownLineWithSender:sender];
             }
         }
         else {
@@ -439,7 +457,7 @@ typedef struct {
 
 /**
  刷新标题
-
+ 
  @param titles 标题组
  */
 - (void)reloadTitles:(NSArray *)titles
@@ -454,7 +472,7 @@ typedef struct {
 }
 /**
  设置item的title
-
+ 
  @param progress 翻页进度
  @param sourceIndex 源index
  @param targetIndex 目标index
@@ -473,10 +491,28 @@ typedef struct {
         [self gradientTitleColorWithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
     }
     
-    
     //3.处理滑块
     if (self.config.showLine) {
-        [self zoomDownLineWithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
+        switch (self.config.downLineScrollAnimation) {//动画类型
+                case WYDownLineScrollAnimationValue1:
+            {
+                [self configDownLineDefaultAnimationWithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
+            }
+                break;
+                case WYDownLineScrollAnimationValue2:
+            {
+                [self configDownLineAnimationValue2WithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
+            }
+                break;
+                case WYDownLineScrollAnimationNone:
+            {
+                //在滑动结束之后处理滑块
+            }
+                break;
+            default:
+                [self configDownLineDefaultAnimationWithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
+                break;
+        }
     }
     
     //4.处理字体大小
@@ -488,9 +524,10 @@ typedef struct {
     _currentIndex = targetIndex;
 }
 
+
 /**
  缩放字体
-
+ 
  @param progress progress
  @param sourceBtn sourceBtn
  @param targetBtn targetBtn
@@ -510,36 +547,143 @@ typedef struct {
 }
 
 /**
- 缩放移动滑块
-
+ 缩放移动滑块 动画效果value2
+ 
  @param progress progress
  @param sourceBtn sourceBtn
  @param targetBtn targetBtn
  */
-- (void)zoomDownLineWithProgress:(double)progress
-                       sourceBtn:(UIButton *)sourceBtn
-                       targetBtn:(UIButton *)targetBtn
+- (void)configDownLineAnimationValue2WithProgress:(double)progress
+                                        sourceBtn:(UIButton *)sourceBtn
+                                        targetBtn:(UIButton *)targetBtn
 {
     
-    CGFloat sourceW = sourceBtn.frame.size.width;
-    CGFloat targetW = targetBtn.frame.size.width;
+    CGFloat sourceW = 0;
+    CGFloat targetW = 0;
+    
+    if (self.config.downLineWidthEqualToItemWidth) {
+        sourceW = sourceBtn.frame.size.width;
+        targetW = targetBtn.frame.size.width;
+    }
+    else {
+        sourceW = targetW = self.config.downLineWidth;
+    }
+    
+    CGFloat sourceBtnOrigin = sourceBtn.frame.origin.x;
+    CGFloat targetBtnOrigin = targetBtn.frame.origin.x;
+    
+    //1.下划线的宽
+    CGFloat lineW = 0;
+    //2.下划线x
+    CGFloat lineOriginX = 0;
+    //3.下划线最大宽度
+    CGFloat maxLineW = 0;
+    //4.下划线宽度变化范围
+    CGFloat widthChangeRange = 0;
+    
+    //5.滑向右边
+    if (targetBtnOrigin > sourceBtnOrigin) {//向右移动
+        //5.1 目标的right
+        CGFloat targetRight = targetBtn.center.x + targetW * 0.5;
+        CGFloat sourceLeft = sourceBtn.center.x - sourceW * 0.5;
+        
+        //5.2 计算下划线最大宽度
+        maxLineW = targetRight - sourceLeft;
+        
+        //5.3 进度小于0.5 乘以2是为了在进度到达0.5时下划线宽度达到最大值
+        if (progress < 0.5) {//下划线的变化: x不变 宽度增加
+            // 5.3.1 计算宽度变化范围
+            widthChangeRange = maxLineW - sourceW;
+            // 5.3.2 计算下划线的x
+            lineOriginX = self.downLine.frame.origin.x;
+            // 5.3.3 计算下划线的宽度
+            lineW = sourceW + progress * widthChangeRange * 2;
+        }
+        //5.4 进度大于0.5
+        else {//下划线的变化: maxX不变 宽度减小
+            // 5.4.1 计算宽度变化范围
+            widthChangeRange = maxLineW - targetW;
+            // 5.4.2 计算下划线的宽度
+            lineW = widthChangeRange * (1 - progress) * 2 + targetW;
+            // 5.4.3 计算x
+            lineOriginX = targetRight - lineW;
+        }
+    }
+    else {//6. 向左移动
+        //6.1 计算目标最小x
+        CGFloat targetLeft = targetBtn.center.x - targetW * 0.5;
+        //6.2 计算下划线宽度最大值
+        maxLineW = sourceBtn.center.x + sourceW * 0.5 - targetLeft;
+        //6.3 进度小于0.5 乘以2是为了在进度到达0.5时下划线宽度达到最大值
+        if (progress < 0.5) {//下划线的变化: right不变 宽度增加
+            // 6.3.1 计算宽度变化范围
+            widthChangeRange = maxLineW - sourceW;
+            // 6.3.2 计算下划线的宽度
+            lineW = sourceW + progress * widthChangeRange * 2;
+            // 6.3.3 计算x
+            lineOriginX = sourceBtn.center.x + sourceW * 0.5 - lineW;
+        }
+        //6.4 进度大于0.5
+        else {//下划线的变化: x不变 宽度减小
+            // 6.4.1 计算宽度变化范围
+            widthChangeRange = maxLineW - targetW;
+            // 6.4.2 计算下划线的宽度
+            lineW = widthChangeRange * (1 - progress) * 2 + targetW;
+            // 6.4.3 计算x
+            lineOriginX = targetBtn.center.x - targetW * 0.5;
+        }
+    }
+    
+    //7. 改变下划线frame
+    CGRect lineFrame = self.downLine.frame;
+    lineFrame.size.width = lineW;
+    lineFrame.origin.x = lineOriginX;
+    self.downLine.frame = lineFrame;
+}
+
+/**
+ 缩放移动滑块 默认效果
+ 
+ @param progress progress
+ @param sourceBtn sourceBtn
+ @param targetBtn targetBtn
+ */
+- (void)configDownLineDefaultAnimationWithProgress:(double)progress
+                                         sourceBtn:(UIButton *)sourceBtn
+                                         targetBtn:(UIButton *)targetBtn
+{
+    
+    
+    CGFloat sourceW = 0;
+    CGFloat targetW = 0;
+    
+    if (self.config.downLineWidthEqualToItemWidth) {
+        sourceW = sourceBtn.frame.size.width;
+        targetW = targetBtn.frame.size.width;
+    }
+    else {
+        sourceW = targetW = self.config.downLineWidth;
+    }
     
     CGFloat widthRange = targetW - sourceW;
     
-    CGFloat progressW = sourceW + widthRange * progress;
+    CGFloat lineW = sourceW + widthRange * progress;
     
-    CGFloat moveTotalX = targetBtn.frame.origin.x - sourceBtn.frame.origin.x;
+    CGFloat sourceLineOrigin = sourceBtn.center.x - sourceW * 0.5;
+    CGFloat targetLineOrigin = targetBtn.center.x - targetW * 0.5;
+    
+    CGFloat moveTotalX = targetLineOrigin - sourceLineOrigin;
     CGFloat moveX = moveTotalX * progress;
-    CGFloat currentLineX = moveX + sourceBtn.frame.origin.x;
+    CGFloat lineOriginX = moveX + sourceLineOrigin;
     
     CGRect lineFrame = self.downLine.frame;
-    lineFrame.size.width = progressW;
-    lineFrame.origin.x = currentLineX;
+    lineFrame.size.width = lineW;
+    lineFrame.origin.x = lineOriginX;
     self.downLine.frame = lineFrame;
 }
 /**
  渐变字体颜色
-
+ 
  @param progress progress
  @param sourceBtn sourceBtn
  @param targetBtn targetBtn
@@ -566,7 +710,7 @@ typedef struct {
 
 /**
  设置mainView的contentOffset
-
+ 
  @param offset offset
  */
 - (void)resetContentOffset:(CGFloat)offset
@@ -615,17 +759,32 @@ typedef struct {
         _currentItem = targetBtn;
         [_currentItem setTitleColor:self.config.selectedTitleColor forState:UIControlStateNormal];
     }
+    if (self.config.showLine) {
+        if (self.config.downLineScrollAnimation == WYDownLineScrollAnimationNone) {
+            [self resetDownLineWithSender:targetBtn];
+        }
+    }
 }
 /**
  更新滑块的位置
-
+ 
  @param sender sender
  */
 - (void)resetDownLineWithSender:(UIButton *)sender
 {
     CGRect lineFrame = self.downLine.frame;
-    lineFrame.size.width = sender.frame.size.width;
-    lineFrame.origin.x = sender.frame.origin.x;
+    CGFloat lineW = 0;
+    CGFloat origin = 0;
+    if (self.config.downLineWidthEqualToItemWidth) {
+        lineW = sender.frame.size.width;
+        origin = sender.frame.origin.x;
+    }
+    else {
+        lineW = self.config.downLineWidth;
+        origin = sender.center.x - lineW * 0.5;
+    }
+    lineFrame.size.width = lineW;
+    lineFrame.origin.x = origin;
     self.downLine.frame = lineFrame;
 }
 @end
