@@ -58,4 +58,4 @@
   * 2017-8-9: 上传新版本（使用scrollView替代collectionView，新增多种自定义效果）
   
  ## 最后
-  * 如果有什么问题欢迎 [issues me](https://github.com/lwy121810/WYPageView/issues) 或者QQ群'479663605'（iOS 11 前沿技术交流）'497140713'（SDAutoLayout）联系我
+  * 如果有什么问题欢迎 [issues me](https://github.com/lwy121810/WYPageView/issues) 或者QQ群 ' 479663605 '（iOS 11 前沿技术交流）' 497140713'（SDAutoLayout）联系我
