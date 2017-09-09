@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 
 //开启debug 开启之后会检查传入的数据（vc是否包含导航栏，vc数量是否与title数量一致等）
-#define WYDEBUG
+//#define WYDEBUG
 
 #ifdef WYDEBUG
 #define WYLog(s, ... ) NSLog( @"[%@ in line %d] ===============>%@", [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
@@ -23,51 +23,98 @@
 
 #undef	RGBA
 #define RGBA(R,G,B,A)	[UIColor colorWithRed:R/255.0f green:G/255.0f blue:B/255.0f alpha:A]
+
 /**
- 在拖拽contentView时、滑块的滚动动画 在'showLine'等于'YES'时有效
- 
- - WYDownLineScrollAnimationNone: 无动画、在拖拽结束后滑块移动到目标位置
- - WYDownLineScrollAnimationValue1: 默认动画、在拖拽时滑块的x随拖拽而变化；滑块的宽度随着拖拽进度渐变到跟下一个item的宽度相等（如果设置的downLineWidthEqualToItemWidth为NO,滑块的宽度将不会变化、只变化滑块的x）
- - WYDownLineScrollAnimationValue2: 类似于爱奇艺首页导航动画. 拖拽时滑块的x先保持不变、渐变宽度,当滑块的最大x值等于下一个item的maxX时变化滑块的宽度
+ 在拖拽contentView时、指示器的滚动效果
+
+ - WYIndicatorScrollAnimationNone: 无动画、在拖拽结束后指示器移动到目标位置
+ - WYIndicatorScrollAnimationValue1: 默认动画、在拖拽时滑块的x随拖拽而变化；指示器的宽度随着拖拽进度渐变到跟下一个item的宽度相等（如果设置的'indicatorViewWidthEqualToItemWidth'为NO,滑块的宽度将不会变化、只变化滑块的x）
+ - WYIndicatorScrollAnimationValue2: 类似于爱奇艺首页导航动画. 拖拽时滑块的x先保持不变、渐变宽度,当滑块的最大x值等于下一个item的maxX时变化滑块的宽度
+ - WYIndicatorScrollAnimationCustom: 自定义滚动效果 需实现'pageTitleView'的'setCustomIndicatorViewScrollAnimation'代理方法 如不实现 则按照'WYIndicatorScrollAnimationValue1'效果
  */
-typedef NS_ENUM(NSInteger, WYDownLineScrollAnimation) {
-    WYDownLineScrollAnimationNone = 0,
-    WYDownLineScrollAnimationValue1,
-    WYDownLineScrollAnimationValue2,
-    WYDownLineScrollAnimationDefault = WYDownLineScrollAnimationValue1
+typedef NS_ENUM(NSInteger, WYIndicatorScrollAnimation) {
+    WYIndicatorScrollAnimationNone = 0,
+    WYIndicatorScrollAnimationValue1,
+    WYIndicatorScrollAnimationValue2,
+    WYIndicatorScrollAnimationCustom
 };
 
+/**
+ 指示器类型
+
+ - WYPageTitleIndicatorViewStyleNone: 不显示指示器
+ - WYPageTitleIndicatorViewStyleDownLine: 下划线类型
+ - WYPageTitleIndicatorViewStyleCustom: 自定义类型 需要遵守'pageTitleView'的数据源 并实现数据源方法
+ */
+typedef NS_ENUM(NSInteger, WYPageTitleIndicatorViewStyle) {
+    WYPageTitleIndicatorViewStyleNone = 0,
+    WYPageTitleIndicatorViewStyleDownLine,
+    WYPageTitleIndicatorViewStyleCustom,
+};
+
+/**
+ 指示器的位置
+
+ - WYPageTitleIndicatorViewPositionStyleBottom: 指示器在下面
+ - WYPageTitleIndicatorViewPositionStyleTop: 指示器在上面
+ - WYPageTitleIndicatorViewPositionStyleCenter: 指示器在中间
+ */
+typedef NS_ENUM(NSInteger, WYPageTitleIndicatorViewPositionStyle) {
+    WYPageTitleIndicatorViewPositionStyleBottom = 0,
+    WYPageTitleIndicatorViewPositionStyleTop,
+    WYPageTitleIndicatorViewPositionStyleCenter,
+};
+
+/**
+ 当只有一个按钮的时候 按钮的分布位置
+
+ - WYPageSingleTitleTextAlignmentLeft: 在左边
+ - WYPageSingleTitleTextAlignmentCenter: 在中间
+ - WYPageSingleTitleTextAlignmentRight: 在右边
+ */
+typedef NS_ENUM(NSInteger, WYPageSingleTitleTextAlignment) {
+    WYPageSingleTitleTextAlignmentLeft = 0,
+    WYPageSingleTitleTextAlignmentCenter,
+    WYPageSingleTitleTextAlignmentRight
+};
 
 @interface WYPageConfig : NSObject
-/**
- 是否显示下滑块 默认显示'YES'
- */
-@property (nonatomic , assign) BOOL showLine;
 
 /**
- 下滑块高度 默认'2'
+ 指示器类型 默认'WYPageTitleIndicatorViewStyleDownLine'
  */
-@property (nonatomic , assign) CGFloat downLineHeight;
+@property (nonatomic , assign) WYPageTitleIndicatorViewStyle indicatorStyle;
 
 /**
- 下滑块颜色 默认红色
+ 指示器的位置 默认在下面 'WYPageTitleIndicatorViewPositionStyleBottom'
  */
-@property (nonatomic , strong) UIColor *downLineColor;
+@property (nonatomic , assign) WYPageTitleIndicatorViewPositionStyle indicatorPositionStyle;
+
 
 /**
- 下划线宽度是否等于标题item的宽度 默认'YES' YES: 相等 NO: 不相等,可以手动设置'downLineWidth'的值
+ 指示器高度 默认'2'
  */
-@property (nonatomic , assign) BOOL downLineWidthEqualToItemWidth;
+@property (nonatomic , assign) CGFloat indicatorViewHeight;
 
 /**
- 下划线的宽度 默认'30' 在'downLineWidthEqualToItemWidth'为'NO'时有效
+ 指示器颜色 默认红色 如果是自定义指示器 需要自己设置指示器背景颜色
  */
-@property (nonatomic , assign) CGFloat downLineWidth;
+@property (nonatomic , strong) UIColor *indicatorViewColor;
 
 /**
- 滑块的滚动动画效果（只有在'showLine'为'YES'时有效）
+ 指示器宽度是否等于标题item的宽度 默认'YES' YES: 相等 NO: 不相等,可以手动设置'indicatorViewWidth'的值
  */
-@property (nonatomic , assign) WYDownLineScrollAnimation downLineScrollAnimation;
+@property (nonatomic , assign) BOOL indicatorViewWidthEqualToItemWidth;
+
+/**
+ 指示器的宽度 默认'30' 在'indicatorViewWidthEqualToItemWidth'为'NO'时有效 如果是自定义指示器 会优先使用其frame
+ */
+@property (nonatomic , assign) CGFloat indicatorViewWidth;
+
+/**
+ 指示器的滚动效果 默认'WYIndicatorScrollAnimationValue1'
+ */
+@property (nonatomic , assign) WYIndicatorScrollAnimation indicatorViewScrollAnimation;
 
 /**
  标题之间的间隔 默认'15'
@@ -169,4 +216,14 @@ typedef NS_ENUM(NSInteger, WYDownLineScrollAnimation) {
  */
 @property (nonatomic , assign) BOOL contentScrollEnabled;
 
+
+/**
+ 当只有一个标题的时候 标题的位置 默认在左边 （只对只有一个标题时有效）
+ */
+@property (nonatomic , assign) WYPageSingleTitleTextAlignment singleTitleAlignment;
+
+/**
+ 默认选中下标 默认'0'
+ */
+@property (nonatomic , assign) NSInteger defaultSelectedIndex;
 @end

@@ -11,6 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ThreeViewController">
             <connections>
+                <outlet property="iconView" destination="U26-tR-MjU" id="6wp-Xl-kE7"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,15 +20,35 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="U26-tR-MjU">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="three" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Vt-p9-bMl">
-                    <rect key="frame" x="142" y="307" width="40" height="21"/>
+                    <rect key="frame" x="159" y="62" width="40" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <nil key="textColor"/>
+                    <color key="textColor" red="1" green="0.11885470530543796" blue="0.063254563795959062" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j4D-tm-yWZ">
+                    <rect key="frame" x="118" y="134" width="138" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="点我回到上一个页面">
+                        <color key="titleColor" red="1" green="0.17332582456302237" blue="0.089929076243711936" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                    </state>
+                    <connections>
+                        <action selector="buttonAction:" destination="-1" eventType="touchUpInside" id="TiG-W8-C4u"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="0.78487353195771659" green="0.72097656249525333" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="U26-tR-MjU" secondAttribute="trailing" id="CH8-Tf-wWk"/>
+                <constraint firstItem="U26-tR-MjU" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Gbb-hr-1BT"/>
+                <constraint firstAttribute="bottom" secondItem="U26-tR-MjU" secondAttribute="bottom" id="sXj-hG-kdh"/>
+                <constraint firstItem="U26-tR-MjU" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="xFC-y3-XHT"/>
+            </constraints>
+            <point key="canvasLocation" x="33.5" y="62.5"/>
         </view>
     </objects>
 </document>

@@ -11,6 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="FiveViewController">
             <connections>
+                <outlet property="iconView" destination="tef-iU-029" id="1aE-5c-hWO"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,15 +20,18 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="five" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SeV-mr-nwp">
-                    <rect key="frame" x="131" y="344" width="28" height="21"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <nil key="textColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="tef-iU-029">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                </imageView>
             </subviews>
             <color key="backgroundColor" red="0.80355474677400407" green="0.96782497992008742" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+            <constraints>
+                <constraint firstItem="tef-iU-029" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="BKW-bS-i6T"/>
+                <constraint firstAttribute="trailing" secondItem="tef-iU-029" secondAttribute="trailing" id="JJY-OU-vHQ"/>
+                <constraint firstItem="tef-iU-029" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="kUy-1Q-yDC"/>
+                <constraint firstAttribute="bottom" secondItem="tef-iU-029" secondAttribute="bottom" id="s9o-1t-h7h"/>
+            </constraints>
+            <point key="canvasLocation" x="37.5" y="54.5"/>
         </view>
     </objects>
 </document>

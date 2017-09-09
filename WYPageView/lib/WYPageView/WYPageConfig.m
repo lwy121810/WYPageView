@@ -13,17 +13,21 @@
 - (instancetype)init {
     if(self = [super init]) {
         
-        self.showLine = YES;
+        self.indicatorStyle = WYPageTitleIndicatorViewStyleDownLine;
         
-        self.downLineHeight = 2;
+        self.indicatorPositionStyle = WYPageTitleIndicatorViewPositionStyleBottom;
         
-        self.downLineColor = [UIColor redColor];
+        self.indicatorViewHeight = 2;
         
-        self.downLineWidthEqualToItemWidth = YES;
+        self.indicatorViewColor = [UIColor redColor];
         
-        self.downLineWidth = 30.0;
+        self.indicatorViewWidthEqualToItemWidth = YES;
+    
+        self.indicatorViewWidth = 30.0;
         
-        self.downLineScrollAnimation = WYDownLineScrollAnimationDefault;
+        self.indicatorViewScrollAnimation = WYIndicatorScrollAnimationValue1;
+        
+        self.singleTitleAlignment = WYPageSingleTitleTextAlignmentLeft;
         
         self.titleMargin = 15;
         
@@ -58,6 +62,8 @@
         self.contentScrollEnabled = YES;
         
         self.itemWidth = 80.f;
+        
+        self.defaultSelectedIndex = 0;
     }
     return self;
 }

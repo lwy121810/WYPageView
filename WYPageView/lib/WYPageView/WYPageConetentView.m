@@ -9,13 +9,14 @@
 #import "WYPageConetentView.h"
 #import "WYPageConfig.h"
 
+#define kWYMainViewTag 1000
 @interface WYPageConetentView ()<UIScrollViewDelegate>
 {
-    NSInteger _currentIndex;
+//    NSInteger _currentIndex;
 }
 @property (nonatomic , strong) NSMutableDictionary<NSNumber*,UIViewController *> *displayChildVcData;
 @property (nonatomic , strong) UIScrollView *scrollView;
-
+@property (nonatomic , assign) NSInteger currentIndex;
 @property (nonatomic , strong) NSMutableArray *viewControllers;
 
 @property (nonatomic , weak) UIViewController *parentController;
@@ -52,6 +53,7 @@
         scrollView.delegate = self;
         scrollView.pagingEnabled = YES;
         scrollView.bounces = NO;
+        scrollView.tag = kWYMainViewTag;
         _scrollView = scrollView;
     }
     return _scrollView;
@@ -74,28 +76,43 @@
         self.viewControllers = [childrenVcs mutableCopy];
         self.parentController = parentViewController;
         self.config = config;
+        self.currentIndex = self.config.defaultSelectedIndex;
         [self setupView];
     }
     return self;
 }
+- (void)setCurrentIndex:(NSInteger)currentIndex
+{
+    _currentIndex = currentIndex;
+    if (_currentIndex < 0) {
+        _currentIndex = 0;
+    }
+    
+    if (_currentIndex > self.viewControllers.count - 1) {
+        _currentIndex = self.viewControllers.count - 1;
+    }
+}
 
 - (void)setupView
 {
-    
     self.scrollView.frame = self.bounds;
     
     CGFloat contentSize = self.viewControllers.count * self.scrollView.frame.size.width;
     
     self.scrollView.contentSize = CGSizeMake(contentSize, 0);
     
-    _currentIndex = 0;
-    
     self.scrollView.scrollEnabled = self.config.contentScrollEnabled;
     
-    UIViewController *firstVc = [self getChildrenControllerWithIndex:0];
+    CGFloat offset = _currentIndex * CGRectGetWidth(self.scrollView.frame);
     
-    [self addChildViewController:firstVc atIndex:0];
+    self.scrollView.contentOffset = CGPointMake(offset, 0);
+    
+    UIViewController *vc = [self getChildrenControllerWithIndex:_currentIndex];
+    
+    [self addChildViewController:vc atIndex:_currentIndex];
 }
+
+
 /**
  移除控制器，且从display中移除
  
@@ -113,6 +130,8 @@
 #pragma mark - public method
 - (void)setContentOffsetWithCurrentIndex:(NSInteger)index animated:(BOOL)animated
 {
+    if (_currentIndex == index) return;
+    
     _isForbidScrollDelegate = YES;
     
     CGFloat offset = index * self.scrollView.frame.size.width;
@@ -148,7 +167,11 @@
         [childController removeFromParentViewController];
     }
 }
-
+- (void)addChildControllerAtIndex:(NSInteger)index
+{
+    UIViewController *vc = [self getChildrenControllerWithIndex:index];
+    [self addChildViewController:vc atIndex:index];
+}
 /**
  添加子控制器
  
@@ -162,7 +185,7 @@
     
     [self.parentController addChildViewController:childController];
     
-    CGRect frame = self.scrollView.frame;
+    CGRect frame = self.scrollView.bounds;
     frame.origin.x = index * self.scrollView.frame.size.width;
     childController.view.frame = frame;
     
@@ -195,6 +218,8 @@
     [self removeAllSubViewsWithSuperView:self.scrollView];
     
     [self.scrollView setContentOffset:CGPointMake(0, 0)];
+    
+    _currentIndex = 0;
     
     [self setupView];
 }
@@ -232,16 +257,15 @@
     //0.判断是不是点击事件
     if (_isForbidScrollDelegate) return;
     
+    if (scrollView.tag != kWYMainViewTag) return;
+    
     CGFloat progress = 0;
     NSInteger sourceIndex = 0;
     NSInteger targetIndex = 0;
     
     CGFloat scrollViewW = scrollView.frame.size.width;
     CGFloat currentOffsetX = scrollView.contentOffset.x;
-    BOOL isSlipToRightPage = YES;
     if (_startOffsetX < currentOffsetX) {//左滑
-        // 0.标记滑动方向
-        isSlipToRightPage = YES;
         
         // 1.计算progress floor函数是取整
         progress = currentOffsetX / scrollViewW - floor(currentOffsetX / scrollViewW);
@@ -253,17 +277,15 @@
         targetIndex = sourceIndex + 1; //因为是左滑 所以target是source ＋ 1
         if (targetIndex >= self.viewControllers.count) {
             targetIndex = self.viewControllers.count - 1;
+            progress = 1;
         }
         // 4.如果完全滑过去
         if (currentOffsetX - _startOffsetX == scrollViewW ){
             progress = 1;
             targetIndex = sourceIndex;
         }
-        
     }
     else {//右滑
-        // 0.标记滑动方向
-        isSlipToRightPage = NO;
         // 1.计算progress
         progress = 1 - (currentOffsetX / scrollViewW - floor(currentOffsetX / scrollViewW));
         
@@ -296,6 +318,7 @@
     //标记不是点击事件
     _isForbidScrollDelegate = NO;
     
+    _currentIndex = [self getCurrentIndex:scrollView];
     //标记开始的偏移量
     _startOffsetX = scrollView.contentOffset.x;
 }
@@ -307,24 +330,37 @@
     
     //2.移除其他vc
     NSDictionary *childData = self.displayChildVcData;
-    [childData enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull key, UIViewController * _Nonnull obj, BOOL * _Nonnull stop) {
-        if (![key isEqual:@(currentIndex)]) {
+    BOOL contain = [[childData allKeys] containsObject:@(currentIndex)];
+    
+    if (contain) {
+        [childData enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull key, UIViewController * _Nonnull obj, BOOL * _Nonnull stop) {
+            if (![key isEqual:@(currentIndex)]) {
+                [self removeChildViewController:obj atIndex:[key integerValue]];
+            }
+        }];
+    }
+    else {
+        [childData enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull key, UIViewController * _Nonnull obj, BOOL * _Nonnull stop) {
             [self removeChildViewController:obj atIndex:[key integerValue]];
-        }
-    }];
+        }];
+        
+        [self addChildControllerAtIndex:currentIndex];
+    }
+ 
     
     //3.滑动停止，跟开始滑动的偏移量一致 说明还停留在当前页
     if (_startOffsetX == scrollView.contentOffset.x) return;
     
     //4.代理
-    if (_delegate && [_delegate respondsToSelector:@selector(scrollViewDidEndAtIndex:)]) {
-        [_delegate scrollViewDidEndAtIndex:currentIndex];
+    if (_delegate && [_delegate respondsToSelector:@selector(scrollViewDidEndDeceleratingAtIndex:)]) {
+        [_delegate scrollViewDidEndDeceleratingAtIndex:currentIndex];
     }
-    
 }
-#pragma mark - scrollView动画结束之后
+#pragma mark - scrollView动画结束之后 
+//setContentOffset:animated: 方法animated为YES时会调用
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
 {
+    if (scrollView.tag != kWYMainViewTag) return;
     //点击标题 scrollView动画结束之后 移除上一个控制器
     UIViewController *currentViewController = self.displayChildVcData[@(_currentIndex)];
     if (currentViewController) {

@@ -6,11 +6,14 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="FourViewController">
             <connections>
+                <outlet property="iconView" destination="OeV-8O-81c" id="2Di-cq-N7z"/>
+                <outlet property="tableView" destination="aaQ-Tv-Pdp" id="HGg-y2-fkL"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,15 +22,27 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="four" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="j70-37-OnL">
-                    <rect key="frame" x="166" y="312" width="65" height="47"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <nil key="textColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OeV-8O-81c">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                </imageView>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="aaQ-Tv-Pdp">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="333.5"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <color key="separatorColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <color key="sectionIndexBackgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </tableView>
             </subviews>
             <color key="backgroundColor" red="0.5331785792832584" green="0.78592884846255573" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="aaQ-Tv-Pdp" secondAttribute="trailing" id="7b6-iP-lRu"/>
+                <constraint firstAttribute="bottom" secondItem="OeV-8O-81c" secondAttribute="bottom" id="BGh-Wm-LX8"/>
+                <constraint firstItem="aaQ-Tv-Pdp" firstAttribute="height" secondItem="i5M-Pr-FkT" secondAttribute="height" multiplier="1:2" id="Q6a-9M-ib1"/>
+                <constraint firstItem="OeV-8O-81c" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Tcu-GR-vKZ"/>
+                <constraint firstItem="aaQ-Tv-Pdp" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="avC-sG-gbI"/>
+                <constraint firstItem="OeV-8O-81c" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="qRk-MD-gTW"/>
+                <constraint firstItem="aaQ-Tv-Pdp" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="uVG-dz-0Yw"/>
+                <constraint firstAttribute="trailing" secondItem="OeV-8O-81c" secondAttribute="trailing" id="yte-5G-vt6"/>
+            </constraints>
             <point key="canvasLocation" x="33.5" y="77.5"/>
         </view>
     </objects>

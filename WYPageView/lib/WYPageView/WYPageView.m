@@ -8,7 +8,6 @@
 
 #import "WYPageView.h"
 #import "WYPageConetentView.h"
-#import "WYPageTitleView.h"
 
 @interface WYPageView ()<WYPageTitleViewDelegate, WYPageConetentViewDelegate>
 
@@ -28,8 +27,11 @@
     if (!_titleView) {
         CGFloat headerH = self.config.titleViewHeight;
         CGRect headerFrame = CGRectMake(0, 0, self.bounds.size.width, headerH);
-        WYPageTitleView *headerView = [[WYPageTitleView alloc] initWithFrame:headerFrame titles:self.titlesArray config:self.config];
-        
+        id<WYPageTitleViewDataSource> dataSource = nil;
+        if (self.config.indicatorStyle == WYPageTitleIndicatorViewStyleCustom) {// 自定义指示器的时候 让父控制器实现相应的数据源方法
+            dataSource = (id<WYPageTitleViewDataSource>) self.parentViewController;
+        }
+        WYPageTitleView *headerView = [[WYPageTitleView alloc] initWithFrame:headerFrame titles:self.titlesArray config:self.config dataSource:dataSource];
         [self addSubview:headerView];
         headerView.delegate = self;
         
@@ -207,6 +209,9 @@
     if (config == nil) {
         config = [[WYPageConfig alloc] init];
     }
+    
+    _currentSelectedIndex = config.defaultSelectedIndex;
+    
     self.config = config;
     
     BOOL haveTitle = NO;
@@ -216,6 +221,7 @@
     }
     
     [self setupDataWithHaveTitles:haveTitle];
+    
     [self setupView];
 }
 - (void)setupDataWithHaveTitles:(BOOL)haveTitles {
@@ -251,6 +257,25 @@
     self.contentView.backgroundColor = [UIColor whiteColor];
 }
 
+- (void)setCurrentSelectedIndex:(NSInteger)currentSelectedIndex
+{
+    
+    if (_currentSelectedIndex == currentSelectedIndex) return;
+    if (self.childVcs == nil || self.childVcs.count == 0 || self.titlesArray == nil || self.titlesArray.count == 0) {
+        return;
+    }
+    
+    if (currentSelectedIndex < 0) {
+        currentSelectedIndex = 0;
+    }
+    if (currentSelectedIndex > self.childVcs.count - 1) {
+        currentSelectedIndex = self.childVcs.count - 1;
+    }
+    _currentSelectedIndex = currentSelectedIndex;
+    
+    [self.titleView setupSelectedIndex:currentSelectedIndex];
+}
+
 #pragma mark - WYPageTitleViewDelegate
 - (void)pageTitleView:(WYPageTitleView *)pageTitleView selectdIndexItem:(NSInteger)selectdIndex oldIndex:(NSInteger)oldIndex
 {
@@ -261,6 +286,7 @@
         animated = difference <= 1;
     }
     [self.contentView setContentOffsetWithCurrentIndex:selectdIndex animated:animated];
+    _currentSelectedIndex = selectdIndex;
 }
 
 #pragma mark - WYPageConetentViewDelegate
@@ -268,8 +294,10 @@
 {
     [self.titleView setTitleWithProgress:progress sourceIndex:sourceIndex targetIndex:targetIndex];
 }
-- (void)scrollViewDidEndAtIndex:(NSInteger)currentIndex
+- (void)scrollViewDidEndDeceleratingAtIndex:(NSInteger)currentIndex
 {
     [self.titleView setHeaderContentOffsetWithCurrentIndex:currentIndex];
+    _currentSelectedIndex = currentIndex;
 }
+
 @end

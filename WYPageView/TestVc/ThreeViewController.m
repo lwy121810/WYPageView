@@ -9,6 +9,7 @@
 #import "ThreeViewController.h"
 
 @interface ThreeViewController ()
+@property (weak, nonatomic) IBOutlet UIImageView *iconView;
 
 @end
 
@@ -18,6 +19,28 @@
     // Do any additional setup after loading the view from its nib.
     
     NSLog(@"viewDidLoad >>>>>>>>>>>>>>>>>> %@", NSStringFromClass([self class]));
+    //lwy1.jpeg
+    NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
+    NSString *iconPath = [resourcePath stringByAppendingPathComponent:@"lwy1.jpeg"];
+    UIImage *icon = [UIImage imageWithContentsOfFile:iconPath];
+    self.iconView.image = icon;
+}
+
+- (void)dealloc
+{
+    
+    _iconView.image = nil;
+    _iconView = nil;
+    NSLog(@"dealloc --------------  %@", NSStringFromClass([self class]));
+}
+- (IBAction)buttonAction:(id)sender {
+    NSLog(@"buttonAction -- ");
+    if (self.navigationController) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+    else {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 

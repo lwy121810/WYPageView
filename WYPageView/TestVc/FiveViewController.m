@@ -8,19 +8,72 @@
 
 #import "FiveViewController.h"
 
-@interface FiveViewController ()
+static NSString *kIdentifier = @"kTest";
+@interface FiveViewController ()<UITableViewDelegate, UITableViewDataSource>
+@property (weak, nonatomic) IBOutlet UIImageView *iconView;
 
+@property (nonatomic , strong) UITableView *tableView;
 @end
 
 @implementation FiveViewController
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+- (UITableView *)tableView
+{
+    if (!_tableView) {
+        UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+        tableView.delegate = self;
+        tableView.dataSource = self;
+        tableView.tableFooterView = [UIView new];
+        [self.view addSubview:tableView];
+        
+        [tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kIdentifier];
+        self.tableView = tableView;
+    }
+    return _tableView;
 }
 
 
+- (void)dealloc
+{
+    
+    NSLog(@"dealloc --------------  %@", NSStringFromClass([self class]));
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    
+    
+    NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
+    NSString *iconPath = [resourcePath stringByAppendingPathComponent:@"lwy4.jpeg"];
+    UIImage *icon = [UIImage imageWithContentsOfFile:iconPath];
+    self.iconView.image = icon;
+    
+    self.tableView.backgroundColor = [UIColor clearColor];
+}
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    self.tableView.frame = self.view.bounds;
+}
 
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kIdentifier];
+    
+    cell.textLabel.text = @"five";
+    cell.contentView.backgroundColor = [UIColor clearColor];
+    cell.backgroundColor = [UIColor clearColor];
+    
+    return cell;
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 5;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSLog(@"didSelectRowAtIndexPath >>>> %@", indexPath);
+}
 /*
 #pragma mark - Navigation
 

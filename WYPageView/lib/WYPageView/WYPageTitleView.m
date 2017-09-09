@@ -7,59 +7,50 @@
 //
 
 #import "WYPageTitleView.h"
-#import "WYPageConfig.h"
 
 typedef struct {
     CGFloat red;
     CGFloat green;
     CGFloat blue;
-    BOOL isRGB;
+    CGFloat alpha;
 }WYRGBNumber;
+
+
 
 @interface WYPageTitleView ()
 {
     NSInteger _currentIndex;
     UIButton *_currentItem;
 }
-
-/**
- 下滑块
- */
-@property (nonatomic  , weak) UIView *downLine;
-
-/**
- scrollView
- */
+/** scrollView */
 @property (nonatomic , strong) UIScrollView *mainView;
 
-/**
- 存放item的数组
- */
+/** 存放item的数组 */
 @property (nonatomic , strong) NSMutableArray <UIButton *>* itemArray;
 
-/**
- 标题数组
- */
+/** 标题数组 */
 @property (nonatomic , strong) NSArray<NSString *> *titles;
 
-/**
- 选中的字体颜色rgb值
- */
+/** 选中的字体颜色rgb值 */
 @property (nonatomic , assign) WYRGBNumber selectColor;
 
-
-/**
- normal状态下字体颜色rgb值
- */
+/** normal状态下字体颜色rgb值 */
 @property (nonatomic , assign) WYRGBNumber normalColor;
 
-/**
- 字体颜色变化范围
- */
+/** 字体颜色变化范围 */
 @property (nonatomic , assign) WYRGBNumber colorRange;
 
 @property (nonatomic , strong) WYPageConfig *config;
+/** 指示器view */
+@property (nonatomic , strong) UIView *indicatorView;
 
+/** 指示器view的高 */
+@property (nonatomic , assign) CGFloat indicatorHeight;
+
+/** 指示器view的宽度 */
+@property (nonatomic , assign) CGFloat indicatorWidth;
+
+@property (nonatomic , assign) CGRect firstItemFrame;
 @end
 @implementation WYPageTitleView
 #pragma mark - 懒加载
@@ -70,46 +61,26 @@ typedef struct {
     }
     return _itemArray;
 }
-- (UIView *)downLine
-{
-    if (!_downLine) {
-        UIView *view = [[UIView alloc] init];
-        [self.mainView addSubview:view];
-        view.backgroundColor = self.config.downLineColor;
-        self.downLine = view;
-    }
-    return _downLine;
-}
 
-- (instancetype)initWithFrame:(CGRect)frame titles:(NSArray <NSString *>*)titles config:(WYPageConfig *)config
+- (instancetype)initWithFrame:(CGRect)frame titles:(NSArray <NSString *>*)titles config:(WYPageConfig *)config dataSource:(id<WYPageTitleViewDataSource>)dataSource
 {
     if (self = [super initWithFrame:frame]) {
         self.titles = titles;
         if (config == nil) {
             config = [[WYPageConfig alloc] init];
         }
-        self.config = config;
+        _config = config;
+        _indicatorStyle = config.indicatorStyle;
+        
+        _indicatorHeight = config.indicatorViewHeight;
+        _indicatorWidth = config.indicatorViewWidth;
+        _dataSource = dataSource;
         [self setupDefaultValue];
         [self setupUI];
     }
     return self;
 }
-/**
- 初始化
- 
- @param frame frame
- @param titles 标题数组
- @return self
- */
-- (instancetype)initWithFrame:(CGRect)frame titles:(NSArray <NSString *>*)titles
-{
-    if (self = [super initWithFrame:frame]) {
-        self.titles = titles;
-        [self setupDefaultValue];
-        [self setupUI];
-    }
-    return self;
-}
+
 - (UIButton *)createButtonWithTitle:(NSString *)title tag:(NSInteger)tag
 {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -123,24 +94,22 @@ typedef struct {
 #pragma mark - 设置默认值
 - (void)setupDefaultValue
 {
-    _currentIndex = 0;
-    
+    _currentIndex = self.config.defaultSelectedIndex;
+    if (_currentIndex < 0) {
+        _currentIndex = 0;
+    }
+    if (_currentIndex > self.titles.count - 1) {
+        _currentIndex = self.titles.count - 1;
+    }
     if (self.config.gradientTitleColor) {//字体颜色渐变
         WYRGBNumber selectedColor = [self getRGBColor:self.config.selectedTitleColor];
         WYRGBNumber normalColor = [self getRGBColor:self.config.normalTitleColor];
-        if (selectedColor.isRGB == NO) {//转化rgb失败
-            selectedColor = (WYRGBNumber){1.0, 128 / 255.0, 0.0, YES};
-        }
-        if (normalColor.isRGB == NO) {
-            CGFloat num = 85 / 255.0;
-            normalColor = (WYRGBNumber){num, num, num, YES};
-        }
         
         self.selectColor = selectedColor;
         self.normalColor = normalColor;
         
         //计算变化范围
-        WYRGBNumber colorRange = {_selectColor.red - _normalColor.red,_selectColor.green - _normalColor.green,_selectColor.blue - _normalColor.blue};
+        WYRGBNumber colorRange = {_selectColor.red - _normalColor.red,_selectColor.green - _normalColor.green,_selectColor.blue - _normalColor.blue, _selectColor.alpha - _normalColor.alpha};
         self.colorRange = colorRange;
     }
 }
@@ -153,7 +122,7 @@ typedef struct {
  */
 - (UIColor *)getColorWithColorNumber:(WYRGBNumber)rgb
 {
-    return [UIColor colorWithRed:rgb.red green:rgb.green blue:rgb.blue alpha:1];
+    return [UIColor colorWithRed:rgb.red green:rgb.green blue:rgb.blue alpha:rgb.alpha];
 }
 
 /**
@@ -191,7 +160,7 @@ typedef struct {
     CGFloat alpha = 0.0;
     [color getRed:&red green:&green blue:&blue alpha:&alpha];
     
-    return (WYRGBNumber){red,green,blue, YES};
+    return (WYRGBNumber){red,green,blue, alpha};
 }
 - (UIScrollView *)mainView
 {
@@ -204,41 +173,71 @@ typedef struct {
     }
     return _mainView;
 }
-- (void)setupUI
+-  (void)setIndicatorHeight:(CGFloat)indicatorHeight
 {
-    if (self.titles == nil || self.titles.count == 0) return;
+    if (_indicatorHeight == indicatorHeight) return;
+    _indicatorHeight = indicatorHeight;
+    [self resetContentViewHeightWithIndicatorHeight:indicatorHeight];
+}
+
+/**
+ 重新设置按钮和指示器view的高度
+
+ @param indicatorHeight 指示器view的高度
+ */
+- (void)resetContentViewHeightWithIndicatorHeight:(CGFloat)indicatorHeight
+{
+    CGRect indicatorFrame = self.indicatorView.frame;
+    indicatorFrame.size.height = indicatorHeight;
+    self.indicatorView.frame = indicatorFrame;
     
-    self.mainView.frame = self.bounds;
+    CGFloat h = CGRectGetHeight(self.mainView.frame) - indicatorHeight;
+    [self.itemArray enumerateObjectsUsingBlock:^(UIButton * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        CGRect frame = obj.frame;
+        frame.size.height = h;
+        obj.frame = frame;
+    }];
+}
+
+/**
+ 设置标题按钮
+
+ @param itemH 按钮高度
+ @return 按钮总宽度
+ */
+- (CGFloat)setupItemsWithItemHeight:(CGFloat)itemH
+{
+    CGFloat y = 0;
+    WYPageTitleIndicatorViewPositionStyle position = self.config.indicatorPositionStyle;
+    if (position == WYPageTitleIndicatorViewPositionStyleTop) {//指示器在上面
+        y =  _indicatorHeight;
+    }
     
     CGFloat firstX = self.config.titleEdgeItemDistanceOfView;
-    CGFloat h = self.bounds.size.height;
-    if (self.config.showLine) {
-        h = self.bounds.size.height - self.config.downLineHeight;
-    }
-    CGFloat y = 0;
     CGFloat itemMargin = self.config.titleMargin;
     
     __block UIButton *lastView = nil;
-    
     __block CGFloat itemTotalWidth = 0.0;
-    __block CGFloat w = 0;
+    __block CGFloat itemW = 0;
     if (!self.config.autoCalculateTitleItemWidth) {
-        w = self.config.itemWidth;
+        itemW = self.config.itemWidth;
     }
+
+    
     [self.titles enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         //0.计算宽度
         if (self.config.autoCalculateTitleItemWidth) {
-            w = [self getTitleWidth:obj];
+            itemW = [self getTitleWidth:obj];
         }
         //1.创建
         UIButton *button = [self createButtonWithTitle:obj tag:(idx + 1000)];
         //2.设置frame
         if (lastView == nil) {
-            button.frame = CGRectMake(firstX, y, w, h);
+            button.frame = CGRectMake(firstX, y, itemW, itemH);
         }
         else {
             CGFloat x = CGRectGetMaxX(lastView.frame) + itemMargin;
-            button.frame = CGRectMake(x, y, w, h);
+            button.frame = CGRectMake(x, y, itemW, itemH);
         }
         //3.添加到view
         [self.mainView addSubview:button];
@@ -247,7 +246,7 @@ typedef struct {
             button.backgroundColor = self.config.titleItemBackgroundColor;
         }
         //5.处理选中状态
-        if(idx == 0) {
+        if(idx == _currentIndex) {
             //1.设置选中状态字体颜色
             [button setTitleColor:self.config.selectedTitleColor forState:UIControlStateNormal];
             //2.记录当前item
@@ -257,8 +256,10 @@ typedef struct {
             //3.放大字体
             if (self.config.canZoomTitle) {
                 CGFloat zoom = self.config.titleZoomMultiple;
-                button.transform = CGAffineTransformMakeScale(zoom, zoom);
+                [self zoomTitleWithSender:button scale:zoom];
             }
+            //4.记录frame
+            _firstItemFrame = button.frame;
         }
         //6.计算总宽度
         itemTotalWidth += button.frame.size.width;
@@ -268,56 +269,213 @@ typedef struct {
         [self.itemArray addObject:button];
     }];
     
-    if (self.config.showLine) {//显示滑块
-        CGFloat lineW = 0;
-        CGFloat originX = 0;
-        if (self.config.downLineWidthEqualToItemWidth) {
-            lineW = self.itemArray.firstObject.frame.size.width;
-            originX = firstX;
+    if (self.titles.count == 1) {
+        WYPageSingleTitleTextAlignment alignment = self.config.singleTitleAlignment;
+        if (alignment == WYPageSingleTitleTextAlignmentCenter) {
+            CGPoint center = lastView.center;
+            center.x = self.center.x;
+            lastView.center = center;
         }
-        else {
-            lineW = self.config.downLineWidth;
-            originX = self.itemArray.firstObject.center.x - lineW * 0.5;
+        else if (alignment == WYPageSingleTitleTextAlignmentRight) {
+            CGRect frame = lastView.frame;
+            CGFloat x = CGRectGetWidth(self.mainView.frame) - firstX - frame.size.width;
+            frame.origin.x = x;
+            lastView.frame = frame;
         }
-        self.downLine.frame = CGRectMake(originX, self.bounds.size.height - self.config.downLineHeight, lineW, self.config.downLineHeight);
+        
     }
-    
-    if (self.config.canZoomTitle && self.config.showLine) {// 如果缩放了字体 重新调整滑块
-        if (self.config.downLineWidthEqualToItemWidth) {//滑块宽度等于按钮宽度
-            [self resetDownLineWithSender:self.itemArray.firstObject];
-        }
-        else {//手动设置滑块宽度
-            // 调整滑块中心点等于按钮的中心点
-            CGPoint center = self.downLine.center;
-            center.x = self.itemArray.firstObject.center.x;
-            self.downLine.center = center;
-        }
-    }
-    
     CGFloat contentW = CGRectGetMaxX(lastView.frame) + firstX;
-    //设置等距分布
-    if (self.config.equallySpaceWhenItemsWidthLessThanTitleWidth) {
-        if (contentW < self.mainView.frame.size.width) {
-            
-            CGFloat residue = self.mainView.frame.size.width - itemTotalWidth - self.itemArray.firstObject.frame.origin.x - firstX;
-            
-            CGFloat margin = residue / (self.itemArray.count - 1);
-            
-            [self resetItemMargin:margin];
-        }
-    }
     self.mainView.contentSize = CGSizeMake(contentW, 0);
     
+    return itemTotalWidth;
+}
+
+/**
+ 创建指示器view
+ */
+- (void)setupIndicatorView
+{
+    // 不显示指示器 直接返回
+    if (_indicatorStyle == WYPageTitleIndicatorViewStyleNone) return;
+    if (_indicatorStyle == WYPageTitleIndicatorViewStyleDownLine) {//下划线类型
+        UIView *view = [[UIView alloc] init];
+        [self.mainView addSubview:view];
+        view.backgroundColor = self.config.indicatorViewColor;
+        self.indicatorView = view;
+    }
+    else {
+        
+        UIView *view = [self getCustomIndicatorView];
+        [self.mainView addSubview:view];
+        CGFloat ch = CGRectGetHeight(view.frame);
+        CGFloat cw = CGRectGetWidth(view.frame);
+        if (ch <= 0) {
+            ch = 0;
+        }
+        if (cw <= 0) {
+            cw = 0;
+        }
+        
+        _indicatorHeight = ch;
+        _indicatorWidth = cw;
+        
+        self.indicatorView = view;
+    }
+    
+}
+- (void)setupUI
+{
+    if (self.titles == nil || self.titles.count == 0) return;
+    // 1.设置mainView的frame
+    self.mainView.frame = self.bounds;
+    // 2.按钮的高度
+    CGFloat itemH = self.mainView.bounds.size.height;
+   
+    // 3.创建指示器
+    if (_indicatorStyle != WYPageTitleIndicatorViewStyleNone) {
+        // 3.1 创建指示器
+        [self setupIndicatorView];
+        
+        if (_indicatorHeight <= 0) {
+            _indicatorHeight = self.config.indicatorViewHeight;
+        }
+        if (_indicatorWidth <= 0) {
+            _indicatorWidth = self.config.indicatorViewWidth;
+        }
+        
+        // 3.2 根据指示器高度计算按钮的高度
+        if (self.config.indicatorPositionStyle != WYPageTitleIndicatorViewPositionStyleCenter) {
+            itemH = self.mainView.bounds.size.height - _indicatorHeight;
+        }
+    }
+    // 4.创建标题 并计算按钮的总宽度
+    CGFloat itemTotalWidth = [self setupItemsWithItemHeight:itemH];
+    
+    // 5.设置等距分布
+    if (self.config.equallySpaceWhenItemsWidthLessThanTitleWidth) {
+        [self setupItemEquallySpaceWithItemTotalWidth:itemTotalWidth];
+    }
+    // 6.是否显示指示器
+    BOOL showIndicator = self.indicatorStyle != WYPageTitleIndicatorViewStyleNone;
+    
+    // 7.设置指示器view的frame
+    if (showIndicator) {//显示指示器
+        //设置指示器frame
+        [self setupIndicatorViewFrameWithIndicatorW:_indicatorWidth];
+    }
+    // 8.调整指示器的位置
+    if (self.config.canZoomTitle && showIndicator) {// 如果缩放了字体并且显示指示器 重新调整指示器位置
+        [self adjustIndicatorOrigin];
+    }
+    // 9.设置默认背景颜色
     self.mainView.backgroundColor = self.config.titleViewBackgroundColor;
     self.backgroundColor = self.config.titleViewBackgroundColor;
 }
 
 /**
- 重新设置item的间距
- 
- @param margin 间距
+ 调整指示器位置
  */
-- (void)resetItemMargin:(CGFloat)margin
+- (void)adjustIndicatorOrigin
+{
+    UIButton *currentItem = [self getItemWithIndex:_currentIndex];
+    if (self.config.indicatorViewWidthEqualToItemWidth) {//指示器宽度等于按钮宽度
+        [self resetIndicatorViewOriginWithSender:currentItem];
+    }
+    else {//手动设置指示器宽度
+        // 调整指示器中心点等于按钮的中心点
+        CGPoint center = self.indicatorView.center;
+        center.x = currentItem.center.x;
+        self.indicatorView.center = center;
+    }
+}
+
+/**
+ 设置指示器frame
+
+ @param indicatorW 指示器宽度
+ */
+- (void)setupIndicatorViewFrameWithIndicatorW:(CGFloat)indicatorW
+{
+    UIButton *currentItem = [self getItemWithIndex:_currentIndex];
+    CGFloat originX = 0;
+    if (self.config.indicatorViewWidthEqualToItemWidth) {//指示器view与item宽度相同
+        indicatorW = currentItem.frame.size.width;
+        originX = currentItem.frame.origin.x;
+    }
+    else {
+        if (indicatorW == 0) {// 等于0 说明是下划线样式或者自定义view没有宽度
+            indicatorW = self.config.indicatorViewWidth;
+        }
+        originX = currentItem.center.x - indicatorW * 0.5;
+    }
+    CGFloat indicatorH = _indicatorHeight;
+    
+    // 计算y
+    CGFloat indicatorY = 0;
+    CGFloat mainH = CGRectGetHeight(self.mainView.frame);
+    WYPageTitleIndicatorViewPositionStyle position = self.config.indicatorPositionStyle;
+    if (position == WYPageTitleIndicatorViewPositionStyleTop) {//指示器在上面 y = 0
+        indicatorY = 0;
+    }
+    else if (position == WYPageTitleIndicatorViewPositionStyleBottom) {// 指示器view在下面
+        indicatorY = mainH - indicatorH;
+    }
+    else {// 指示器在中间
+        indicatorY = (mainH - indicatorH) * 0.5;
+    }
+    
+    self.indicatorView.frame = CGRectMake(originX, indicatorY, indicatorW, indicatorH);
+}
+
+/**
+ 设置按钮的等距分布
+
+ @param itemTotalWidth 按钮的总宽度
+ */
+- (void)setupItemEquallySpaceWithItemTotalWidth:(CGFloat)itemTotalWidth
+{
+    
+    CGFloat firstX = self.config.titleEdgeItemDistanceOfView;
+    
+    CGFloat contentW = CGRectGetMaxX(self.itemArray.lastObject.frame) + firstX;
+    
+    if (contentW < self.mainView.frame.size.width) {
+        
+        CGFloat residue = self.mainView.frame.size.width - itemTotalWidth - self.itemArray.firstObject.frame.origin.x - firstX;
+        
+        CGFloat margin = residue / (self.itemArray.count - 1);
+        
+        [self resetItemMargin:margin];
+    }
+}
+
+/**
+ 获取自定义的指示器view
+
+ @return view
+ */
+- (UIView *)getCustomIndicatorView
+{
+    if ([_dataSource respondsToSelector:@selector(customIndicatorViewForPageTitleView:)]) {
+        UIView *customView = [_dataSource customIndicatorViewForPageTitleView:self];
+#ifdef WYDEBUG
+        NSAssert(customView, @"自定义的指示器view不能为nil ！！！");
+#endif
+        return customView;
+    }
+#ifdef WYDEBUG
+    NSAssert(NO, @"当自定义指示器view时、应当实现‘- (UIView *)customIndicatorViewForPageTitleView:(WYPageTitleView *)pageTitleView’代理方法");
+#endif
+    return nil;
+
+}
+/**
+ 重新设置item的间距
+
+ @param margin 间距
+ @return 最后一个item
+ */
+- (UIButton *)resetItemMargin:(CGFloat)margin
 {
     __block UIButton *lastView = nil;
     [self.itemArray enumerateObjectsUsingBlock:^(UIButton * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -332,6 +490,7 @@ typedef struct {
         }
         lastView = obj;
     }];
+    return lastView;
 }
 /**
  根据标题获取宽度
@@ -359,7 +518,8 @@ typedef struct {
     //2.点击的同一个 直接返回
     if (index == _currentIndex) return;
     //3.取出上一个按钮
-    UIButton *oldBtn = self.itemArray[_currentIndex];
+    UIButton *oldBtn = [self getItemWithIndex:_currentIndex];
+    if (oldBtn == nil) return;
     //4.更换字体颜色
     //4.1 改变上一个按钮颜色
     UIColor *normalColor = self.config.normalTitleColor;
@@ -387,42 +547,39 @@ typedef struct {
     //6.变化字体
     if (self.config.canZoomTitle) {
         CGFloat zoom = self.config.titleZoomMultiple;
-        if (self.config.titleAnimationEnable) {//有动画
-            NSTimeInterval duration = self.config.titleAnimationDuration;
-            if (duration > 0.0) {//动画时间大于0
-                [UIView animateWithDuration:duration animations:^{
-                    oldBtn.transform = CGAffineTransformMakeScale(1.0, 1.0);
-                    sender.transform = CGAffineTransformMakeScale(zoom, zoom);
-                }];
-            }
-            else {// 动画时间小于0，即没有动画
-                oldBtn.transform = CGAffineTransformMakeScale(1.0, 1.0);
-                sender.transform = CGAffineTransformMakeScale(zoom, zoom);
-            }
+        BOOL animation = self.config.titleAnimationEnable;
+        if (animation) {
+            animation = self.config.titleAnimationDuration > 0.0;
         }
-        else {//无动画
-            oldBtn.transform = CGAffineTransformMakeScale(1.0, 1.0);
-            sender.transform = CGAffineTransformMakeScale(zoom, zoom);
-        }
-        
-    }
-    //7. 调整滑块位置
-    if (self.config.showLine) {
-        if (self.config.titleAnimationEnable) {
-            NSTimeInterval duration = self.config.titleAnimationDuration;
-            if (duration > 0.0) {
-                [UIView animateWithDuration:duration animations:^{
-                    [self resetDownLineWithSender:sender];
-                }];
-            }
-            else {
-                [self resetDownLineWithSender:sender];
-            }
+        if (animation) {
+            [UIView animateWithDuration:self.config.titleAnimationDuration animations:^{
+                [self zoomTitleWithSender:oldBtn scale:1.0];
+                [self zoomTitleWithSender:sender scale:zoom];
+            }];
         }
         else {
-            [self resetDownLineWithSender:sender];
+            [self zoomTitleWithSender:oldBtn scale:1.0];
+            [self zoomTitleWithSender:sender scale:zoom];
         }
     }
+    
+    
+    //7. 调整滑块位置
+    if (_indicatorStyle != WYPageTitleIndicatorViewStyleNone) {
+        BOOL animation = self.config.titleAnimationEnable;
+        if (animation) {
+            animation = self.config.titleAnimationDuration > 0.0;
+        }
+        if (animation) {
+            [UIView animateWithDuration:self.config.titleAnimationDuration animations:^{
+                [self resetIndicatorViewOriginWithSender:sender];
+            }];
+        }
+        else {
+            [self resetIndicatorViewOriginWithSender:sender];
+        }
+    }
+    
     //8.记录当前item
     if (self.config.gradientTitleColor == NO) {//不渐变字体颜色
         //记录当前的item
@@ -445,16 +602,29 @@ typedef struct {
  */
 - (void)clearData
 {
+    
     [self.itemArray removeAllObjects];
-    [self.mainView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [self removeAllSubViewsWithSuperView:self.mainView];
     self.titles = nil;
-    if (_downLine) {
-        _downLine = nil;
+    if (_indicatorView) {
+        [_indicatorView removeFromSuperview];
+        _indicatorView = nil;
     }
+    
     _currentIndex = 0;
-    _currentItem = nil;
+    
+    if (_currentItem) {
+        [_currentItem removeFromSuperview];
+        _currentItem = nil;
+    }
 }
 
+- (void)removeAllSubViewsWithSuperView:(UIView *)superView
+{
+    if (superView == nil || superView.subviews.count == 0) return;
+    
+    [superView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+}
 /**
  刷新标题
  
@@ -470,6 +640,27 @@ typedef struct {
     
     [self resetContentOffset:0];
 }
+
+/**
+ 设置偏移量
+
+ @param targetBtn targetBtn
+ */
+- (void)configContentOffsetWithTargetBtn:(UIButton *)targetBtn
+{
+    CGFloat paginationOrigin = self.mainView.frame.size.width * self.config.paginationScale;
+    
+    CGFloat centerX = targetBtn.center.x;
+    
+    if (centerX > paginationOrigin) {
+        //把item移到中点
+        CGFloat offset = centerX - paginationOrigin;
+        [self resetContentOffset:offset];
+    }
+    else {
+        [self resetContentOffset:0];
+    }
+}
 /**
  设置item的title
  
@@ -482,37 +673,25 @@ typedef struct {
                  targetIndex:(NSInteger)targetIndex
 
 {
-    //1.取出btn
-    UIButton *sourceBtn = self.itemArray[sourceIndex];
-    UIButton *targetBtn = self.itemArray[targetIndex];
+    //0.取出btn
+    UIButton *sourceBtn = [self getItemWithIndex:sourceIndex];
+    UIButton *targetBtn = [self getItemWithIndex:targetIndex];
+  
+    if (sourceBtn == nil || targetBtn == nil) return;
+    
+    //1.处理mainView的偏移量
+    if (progress == 1.0) {
+        [self configContentOffsetWithTargetBtn:targetBtn];
+    }
     
     //2.处理字体颜色
     if (self.config.gradientTitleColor) {//渐变字体颜色
         [self gradientTitleColorWithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
     }
     
-    //3.处理滑块
-    if (self.config.showLine) {
-        switch (self.config.downLineScrollAnimation) {//动画类型
-                case WYDownLineScrollAnimationValue1:
-            {
-                [self configDownLineDefaultAnimationWithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
-            }
-                break;
-                case WYDownLineScrollAnimationValue2:
-            {
-                [self configDownLineAnimationValue2WithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
-            }
-                break;
-                case WYDownLineScrollAnimationNone:
-            {
-                //在滑动结束之后处理滑块
-            }
-                break;
-            default:
-                [self configDownLineDefaultAnimationWithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
-                break;
-        }
+    //3.处理指示器
+    if (_indicatorStyle != WYPageTitleIndicatorViewStyleNone) {// 有指示器
+        [self configIndicatorAnimationWithProgress:progress sourceIndex:sourceIndex targetIndex:targetIndex];
     }
     
     //4.处理字体大小
@@ -522,6 +701,56 @@ typedef struct {
     
     //5.记录最新的index
     _currentIndex = targetIndex;
+}
+/**
+ 设置指示器滚动效果
+
+ @param progress progress
+ @param sourceIndex sourceIndex
+ @param targetIndex targetIndex
+ */
+- (void)configIndicatorAnimationWithProgress:(double)progress
+                                 sourceIndex:(NSInteger)sourceIndex
+                                 targetIndex:(NSInteger)targetIndex
+{
+    
+    UIButton *sourceBtn = [self getItemWithIndex:sourceIndex];
+    UIButton *targetBtn = [self getItemWithIndex:targetIndex];
+    
+    switch (self.config.indicatorViewScrollAnimation) {//动画类型
+        case WYIndicatorScrollAnimationValue1:// 效果1
+        {
+            [self configIndicatorAnimationValue1WithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
+        }
+            break;
+        case WYIndicatorScrollAnimationValue2:// 效果2
+        {
+            [self configIndicatorAnimationValue2WithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
+        }
+            break;
+        case WYIndicatorScrollAnimationNone: // 没效果
+        {
+            //在滑动结束之后处理
+        }
+            break;
+            
+        case WYIndicatorScrollAnimationCustom://自定义
+        {
+            if (_dataSource && [_dataSource respondsToSelector:@selector(setCustomIndicatorViewScrollAnimation:progress:sourceIndex:targetIndex:)]) {
+                [_dataSource setCustomIndicatorViewScrollAnimation:self.indicatorView progress:progress sourceIndex:sourceIndex targetIndex:targetIndex];
+            }
+            else {
+#ifdef WYDEBUG
+                NSAssert(NO, @"当自定义指示器的滚动效果时、应当在'pageView'所在的控制器中实现'setCustomIndicatorViewScrollAnimation:progress:sourceIndex:targetIndex:'数据源方法");
+#endif
+                [self configIndicatorAnimationValue1WithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
+            }
+        }
+            break;
+        default:
+            
+            break;
+    }
 }
 
 
@@ -536,37 +765,49 @@ typedef struct {
                     sourceBtn:(UIButton *)sourceBtn
                     targetBtn:(UIButton *)targetBtn
 {
-    
     //变化字体
     CGFloat zoomRange = self.config.titleZoomMultiple - 1.0;
-    CGFloat sourceZoom = self.config.titleZoomMultiple - zoomRange * progress;
+    
+//    CGFloat sourceZoom = self.config.titleZoomMultiple - zoomRange * progress;
+    
+    CGFloat sourceZoom = (1 - progress) * zoomRange + 1;
+    
     sourceBtn.transform = CGAffineTransformMakeScale(sourceZoom, sourceZoom);
     
-    CGFloat targetZoom = 1.0 + zoomRange * progress;
+    
+//    [self zoomTitleWithSender:sourceBtn scale:sourceZoom];
+    
+    
+    CGFloat targetZoom = 1 + zoomRange * progress;
+    
     targetBtn.transform = CGAffineTransformMakeScale(targetZoom, targetZoom);
 }
 
+- (void)zoomTitleWithSender:(UIButton *)sender scale:(CGFloat)scale
+{
+    sender.transform = CGAffineTransformMakeScale(scale, scale);
+}
+
 /**
- 缩放移动滑块 动画效果value2
+ 移动指示器 动画效果value2
  
  @param progress progress
  @param sourceBtn sourceBtn
  @param targetBtn targetBtn
  */
-- (void)configDownLineAnimationValue2WithProgress:(double)progress
+- (void)configIndicatorAnimationValue2WithProgress:(double)progress
                                         sourceBtn:(UIButton *)sourceBtn
                                         targetBtn:(UIButton *)targetBtn
 {
-    
     CGFloat sourceW = 0;
     CGFloat targetW = 0;
     
-    if (self.config.downLineWidthEqualToItemWidth) {
+    if (self.config.indicatorViewWidthEqualToItemWidth) {
         sourceW = sourceBtn.frame.size.width;
         targetW = targetBtn.frame.size.width;
     }
     else {
-        sourceW = targetW = self.config.downLineWidth;
+        sourceW = targetW = _indicatorWidth;
     }
     
     CGFloat sourceBtnOrigin = sourceBtn.frame.origin.x;
@@ -595,7 +836,7 @@ typedef struct {
             // 5.3.1 计算宽度变化范围
             widthChangeRange = maxLineW - sourceW;
             // 5.3.2 计算下划线的x
-            lineOriginX = self.downLine.frame.origin.x;
+            lineOriginX = self.indicatorView.frame.origin.x;
             // 5.3.3 计算下划线的宽度
             lineW = sourceW + progress * widthChangeRange * 2;
         }
@@ -635,34 +876,32 @@ typedef struct {
     }
     
     //7. 改变下划线frame
-    CGRect lineFrame = self.downLine.frame;
+    CGRect lineFrame = self.indicatorView.frame;
     lineFrame.size.width = lineW;
     lineFrame.origin.x = lineOriginX;
-    self.downLine.frame = lineFrame;
+    self.indicatorView.frame = lineFrame;
 }
 
 /**
- 缩放移动滑块 默认效果
+ 移动指示器 动画效果value1 默认效果
  
  @param progress progress
  @param sourceBtn sourceBtn
  @param targetBtn targetBtn
  */
-- (void)configDownLineDefaultAnimationWithProgress:(double)progress
+- (void)configIndicatorAnimationValue1WithProgress:(double)progress
                                          sourceBtn:(UIButton *)sourceBtn
                                          targetBtn:(UIButton *)targetBtn
 {
-    
-    
     CGFloat sourceW = 0;
     CGFloat targetW = 0;
     
-    if (self.config.downLineWidthEqualToItemWidth) {
+    if (self.config.indicatorViewWidthEqualToItemWidth) {
         sourceW = sourceBtn.frame.size.width;
         targetW = targetBtn.frame.size.width;
     }
     else {
-        sourceW = targetW = self.config.downLineWidth;
+        sourceW = targetW = _indicatorWidth;
     }
     
     CGFloat widthRange = targetW - sourceW;
@@ -676,10 +915,10 @@ typedef struct {
     CGFloat moveX = moveTotalX * progress;
     CGFloat lineOriginX = moveX + sourceLineOrigin;
     
-    CGRect lineFrame = self.downLine.frame;
+    CGRect lineFrame = self.indicatorView.frame;
     lineFrame.size.width = lineW;
     lineFrame.origin.x = lineOriginX;
-    self.downLine.frame = lineFrame;
+    self.indicatorView.frame = lineFrame;
 }
 /**
  渐变字体颜色
@@ -692,17 +931,18 @@ typedef struct {
                              sourceBtn:(UIButton *)sourceBtn
                              targetBtn:(UIButton *)targetBtn
 {
+    
     //1 颜色变化范围
     WYRGBNumber colorRange = _colorRange;
     
     //2 变化sourceBtn
-    WYRGBNumber progeressColor = {_selectColor.red - colorRange.red * progress, _selectColor.green - colorRange.green * progress, _selectColor.blue - colorRange.blue * progress};
+    WYRGBNumber progeressColor = {_selectColor.red - colorRange.red * progress, _selectColor.green - colorRange.green * progress, _selectColor.blue - colorRange.blue * progress, _selectColor.alpha - colorRange.alpha * progress};
     
     UIColor *sourceColor = [self getColorWithColorNumber:progeressColor];
     [sourceBtn setTitleColor:sourceColor forState:UIControlStateNormal];
     
     //3 变化targetBtn
-    WYRGBNumber targetProgressColor = {_normalColor.red + colorRange.red * progress, _normalColor.green + colorRange.green * progress, _normalColor.blue + colorRange.blue * progress};
+    WYRGBNumber targetProgressColor = {_normalColor.red + colorRange.red * progress, _normalColor.green + colorRange.green * progress, _normalColor.blue + colorRange.blue * progress, _normalColor.alpha + colorRange.alpha * progress};
     
     UIColor *targetColor = [self getColorWithColorNumber:targetProgressColor];
     [targetBtn setTitleColor:targetColor forState:UIControlStateNormal];
@@ -737,54 +977,78 @@ typedef struct {
 - (void)setHeaderContentOffsetWithCurrentIndex:(NSInteger)currentIndex
 {
     //0.取出当前item
-    UIButton *targetBtn = self.itemArray[currentIndex];
+    UIButton *targetBtn = [self getItemWithIndex:currentIndex];
     
-    //1.处理mainView的偏移量
-    CGFloat paginationOrigin = self.mainView.frame.size.width * self.config.paginationScale;
+    if (targetBtn == nil) return;
     
-    CGFloat centerX = targetBtn.center.x;
-    
-    if (centerX > paginationOrigin) {
-        //把item移到中点
-        CGFloat offset = centerX - paginationOrigin;
-        [self resetContentOffset:offset];
-    }
-    else {
-        [self resetContentOffset:0];
-    }
-    
-    //2.处理字体颜色
+    //1.处理字体颜色
     if (self.config.gradientTitleColor == NO) {//字体不渐变
         [_currentItem setTitleColor:self.config.normalTitleColor forState:UIControlStateNormal];
         _currentItem = targetBtn;
         [_currentItem setTitleColor:self.config.selectedTitleColor forState:UIControlStateNormal];
     }
-    if (self.config.showLine) {
-        if (self.config.downLineScrollAnimation == WYDownLineScrollAnimationNone) {
-            [self resetDownLineWithSender:targetBtn];
+    //2.处理无动画的指示器样式
+    if (self.config.indicatorStyle != WYPageTitleIndicatorViewStyleNone) {//下划线样式
+        if (self.config.indicatorViewScrollAnimation == WYIndicatorScrollAnimationNone) {
+            [self resetIndicatorViewOriginWithSender:targetBtn];
         }
     }
+    
+    //3.记录当前的index
+    _currentIndex = currentIndex;
 }
 /**
- 更新滑块的位置
+ 设置对应下标的选中效果
+ 
+ @param currentIndex 下标
+ */
+- (void)setupSelectedIndex:(NSInteger)currentIndex
+{
+    UIButton *button = [self getItemWithIndex:currentIndex];
+    
+    if (button == nil) return;
+    
+    [self buttonAction:button];
+}
+
+
+/**
+ 获取对应下标位置的按钮
+
+ @param index 下标
+ @return 按钮
+ */
+- (UIButton *)getItemWithIndex:(NSInteger)index
+{
+    if (index < 0 || index > self.itemArray.count - 1) {
+        return nil;
+    }
+    if (self.itemArray.count == 0) return nil;
+    return self.itemArray[index];
+}
+/**
+ 更新指示器的位置
  
  @param sender sender
  */
-- (void)resetDownLineWithSender:(UIButton *)sender
+- (void)resetIndicatorViewOriginWithSender:(UIButton *)sender
 {
-    CGRect lineFrame = self.downLine.frame;
+    CGRect lineFrame = self.indicatorView.frame;
     CGFloat lineW = 0;
-    CGFloat origin = 0;
-    if (self.config.downLineWidthEqualToItemWidth) {
+    CGFloat originX = 0;
+    if (self.config.indicatorViewWidthEqualToItemWidth) {
         lineW = sender.frame.size.width;
-        origin = sender.frame.origin.x;
+        originX = sender.frame.origin.x;
     }
     else {
-        lineW = self.config.downLineWidth;
-        origin = sender.center.x - lineW * 0.5;
+        if (_indicatorWidth == 0) {
+            _indicatorWidth = self.config.indicatorViewWidth;
+        }
+        lineW = _indicatorWidth;
+        originX = sender.center.x - lineW * 0.5;
     }
     lineFrame.size.width = lineW;
-    lineFrame.origin.x = origin;
-    self.downLine.frame = lineFrame;
+    lineFrame.origin.x = originX;
+    self.indicatorView.frame = lineFrame;
 }
 @end

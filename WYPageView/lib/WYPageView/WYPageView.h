@@ -8,7 +8,21 @@
 
 #import <UIKit/UIKit.h>
 #import "WYPageConfig.h"
+#import "WYPageTitleView.h"
+
+@protocol WYPageViewDelegate <NSObject>
+
+//- (UIView *)
+
+@end
+
 @interface WYPageView : UIView
+
+@property (nonatomic , strong, readonly) WYPageConfig *config;
+/**
+ 当前选中下标
+ */
+@property (nonatomic , assign) NSInteger currentSelectedIndex;
 /**
  初始化 每个控制器需要有自己的标题 默认配置
 

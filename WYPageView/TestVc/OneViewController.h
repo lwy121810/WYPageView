@@ -1,9 +1,9 @@
 //
 //  OneViewController.h
-//  WYPageController
+//  WYPageView
 //
-//  Created by lwy1218 on 2017/8/17.
-//  Copyright © 2017年 eastraycloud. All rights reserved.
+//  Created by lwy1218 on 2017/9/7.
+//
 //
 
 #import <UIKit/UIKit.h>

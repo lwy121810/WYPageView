@@ -11,6 +11,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SixViewController">
             <connections>
+                <outlet property="iconView" destination="xl2-GW-IeZ" id="elV-Eg-e7f"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,15 +20,29 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="six" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cRN-Yu-afG">
-                    <rect key="frame" x="125" y="316" width="21" height="21"/>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xl2-GW-IeZ">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cRN-Yu-afG">
+                    <rect key="frame" x="85" y="6" width="204" height="151"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <string key="text">秋名山上行人稀， 
+常有车手较高低。 
+如今车道依旧在， 
+不见当年老司机。</string>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
             <color key="backgroundColor" red="1" green="0.9125419806993964" blue="0.87675029242221192" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+            <constraints>
+                <constraint firstItem="xl2-GW-IeZ" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="6Kp-96-bkF"/>
+                <constraint firstAttribute="bottom" secondItem="xl2-GW-IeZ" secondAttribute="bottom" id="ASK-A9-DHD"/>
+                <constraint firstItem="xl2-GW-IeZ" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="dV6-Fr-yVQ"/>
+                <constraint firstAttribute="trailing" secondItem="xl2-GW-IeZ" secondAttribute="trailing" id="ttl-Dt-mj5"/>
+            </constraints>
+            <point key="canvasLocation" x="37.5" y="53.5"/>
         </view>
     </objects>
 </document>

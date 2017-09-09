@@ -31,7 +31,8 @@
 
  @param currentIndex 当前停留的页面下标
  */
-- (void)scrollViewDidEndAtIndex:(NSInteger)currentIndex;
+- (void)scrollViewDidEndDeceleratingAtIndex:(NSInteger)currentIndex;
+
 @end
 @interface WYPageConetentView : UIView
 
