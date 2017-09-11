@@ -205,14 +205,14 @@
 		942E34951F612C9D002987A1 /* WYPageView */ = {
 			isa = PBXGroup;
 			children = (
+				942E349C1F612C9D002987A1 /* WYPageView.h */,
+				942E349D1F612C9D002987A1 /* WYPageView.m */,
+				942E349A1F612C9D002987A1 /* WYPageTitleView.h */,
+				942E349B1F612C9D002987A1 /* WYPageTitleView.m */,
 				942E34961F612C9D002987A1 /* WYPageConetentView.h */,
 				942E34971F612C9D002987A1 /* WYPageConetentView.m */,
 				942E34981F612C9D002987A1 /* WYPageConfig.h */,
 				942E34991F612C9D002987A1 /* WYPageConfig.m */,
-				942E349A1F612C9D002987A1 /* WYPageTitleView.h */,
-				942E349B1F612C9D002987A1 /* WYPageTitleView.m */,
-				942E349C1F612C9D002987A1 /* WYPageView.h */,
-				942E349D1F612C9D002987A1 /* WYPageView.m */,
 			);
 			path = WYPageView;
 			sourceTree = "<group>";

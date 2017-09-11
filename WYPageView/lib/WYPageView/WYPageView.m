@@ -21,6 +21,7 @@
 @property (nonatomic , strong) WYPageConfig *config;
 
 @end
+
 @implementation WYPageView
 - (WYPageTitleView *)titleView
 {
@@ -108,7 +109,6 @@
     }
     return self;
 }
-
 
 /**
  获取子控制器
@@ -259,7 +259,6 @@
 
 - (void)setCurrentSelectedIndex:(NSInteger)currentSelectedIndex
 {
-    
     if (_currentSelectedIndex == currentSelectedIndex) return;
     if (self.childVcs == nil || self.childVcs.count == 0 || self.titlesArray == nil || self.titlesArray.count == 0) {
         return;

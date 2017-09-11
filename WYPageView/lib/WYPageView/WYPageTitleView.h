@@ -56,8 +56,10 @@
 /** 自定义指示器的时候的数据源 */
 @property (nonatomic , weak) id<WYPageTitleViewDataSource>dataSource;
 
+/**
+ 指示器类型
+ */
 @property (nonatomic , assign) WYPageTitleIndicatorViewStyle indicatorStyle;
-
 
 /**
  初始化

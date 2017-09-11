@@ -50,7 +50,6 @@ typedef struct {
 /** 指示器view的宽度 */
 @property (nonatomic , assign) CGFloat indicatorWidth;
 
-@property (nonatomic , assign) CGRect firstItemFrame;
 @end
 @implementation WYPageTitleView
 #pragma mark - 懒加载
@@ -258,8 +257,6 @@ typedef struct {
                 CGFloat zoom = self.config.titleZoomMultiple;
                 [self zoomTitleWithSender:button scale:zoom];
             }
-            //4.记录frame
-            _firstItemFrame = button.frame;
         }
         //6.计算总宽度
         itemTotalWidth += button.frame.size.width;
@@ -768,15 +765,9 @@ typedef struct {
     //变化字体
     CGFloat zoomRange = self.config.titleZoomMultiple - 1.0;
     
-//    CGFloat sourceZoom = self.config.titleZoomMultiple - zoomRange * progress;
-    
     CGFloat sourceZoom = (1 - progress) * zoomRange + 1;
     
     sourceBtn.transform = CGAffineTransformMakeScale(sourceZoom, sourceZoom);
-    
-    
-//    [self zoomTitleWithSender:sourceBtn scale:sourceZoom];
-    
     
     CGFloat targetZoom = 1 + zoomRange * progress;
     

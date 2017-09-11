@@ -11,9 +11,6 @@
 
 #define kWYMainViewTag 1000
 @interface WYPageConetentView ()<UIScrollViewDelegate>
-{
-//    NSInteger _currentIndex;
-}
 @property (nonatomic , strong) NSMutableDictionary<NSNumber*,UIViewController *> *displayChildVcData;
 @property (nonatomic , strong) UIScrollView *scrollView;
 @property (nonatomic , assign) NSInteger currentIndex;

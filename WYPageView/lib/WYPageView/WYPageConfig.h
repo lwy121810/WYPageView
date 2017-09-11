@@ -44,7 +44,7 @@ typedef NS_ENUM(NSInteger, WYIndicatorScrollAnimation) {
 
  - WYPageTitleIndicatorViewStyleNone: 不显示指示器
  - WYPageTitleIndicatorViewStyleDownLine: 下划线类型
- - WYPageTitleIndicatorViewStyleCustom: 自定义类型 需要遵守'pageTitleView'的数据源 并实现数据源方法
+ - WYPageTitleIndicatorViewStyleCustom: 自定义类型 需要遵守'pageTitleView'的数据源（dataSource） 并实现数据源方法
  */
 typedef NS_ENUM(NSInteger, WYPageTitleIndicatorViewStyle) {
     WYPageTitleIndicatorViewStyleNone = 0,
@@ -89,7 +89,6 @@ typedef NS_ENUM(NSInteger, WYPageSingleTitleTextAlignment) {
  指示器的位置 默认在下面 'WYPageTitleIndicatorViewPositionStyleBottom'
  */
 @property (nonatomic , assign) WYPageTitleIndicatorViewPositionStyle indicatorPositionStyle;
-
 
 /**
  指示器高度 默认'2'

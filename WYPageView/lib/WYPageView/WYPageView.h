@@ -10,12 +10,6 @@
 #import "WYPageConfig.h"
 #import "WYPageTitleView.h"
 
-@protocol WYPageViewDelegate <NSObject>
-
-//- (UIView *)
-
-@end
-
 @interface WYPageView : UIView
 
 @property (nonatomic , strong, readonly) WYPageConfig *config;
