@@ -7,15 +7,12 @@
 //
 
 #import "WYPageTitleView.h"
-
 typedef struct {
     CGFloat red;
     CGFloat green;
     CGFloat blue;
     CGFloat alpha;
 }WYRGBNumber;
-
-
 
 @interface WYPageTitleView ()
 {
@@ -50,6 +47,8 @@ typedef struct {
 /** 指示器view的宽度 */
 @property (nonatomic , assign) CGFloat indicatorWidth;
 
+@property (nonatomic , assign) CGFloat itemsTotalWidth;
+
 @end
 @implementation WYPageTitleView
 #pragma mark - 懒加载
@@ -59,6 +58,9 @@ typedef struct {
         self.itemArray = [NSMutableArray array];
     }
     return _itemArray;
+}
+- (void)dealloc {
+    WYLog(@"WYPageTitleView ---> dealloc 销毁");
 }
 
 - (instancetype)initWithFrame:(CGRect)frame titles:(NSArray <NSString *>*)titles config:(WYPageConfig *)config dataSource:(id<WYPageTitleViewDataSource>)dataSource
@@ -125,7 +127,7 @@ typedef struct {
 }
 
 /**
- 根据颜色获取rgb值 此方法只能获取rgb空间的颜色值，其他的获取不到（grayColor），因此改用下面的方法
+ 根据颜色获取rgb值 此方法只能获取rgb空间的颜色值，其他的获取不到（如grayColor），因此改用下面的方法
  
  @param color color
  @return rgb
@@ -221,8 +223,6 @@ typedef struct {
     if (!self.config.autoCalculateTitleItemWidth) {
         itemW = self.config.itemWidth;
     }
-
-    
     [self.titles enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         //0.计算宽度
         if (self.config.autoCalculateTitleItemWidth) {
@@ -238,6 +238,7 @@ typedef struct {
             CGFloat x = CGRectGetMaxX(lastView.frame) + itemMargin;
             button.frame = CGRectMake(x, y, itemW, itemH);
         }
+        
         //3.添加到view
         [self.mainView addSubview:button];
         //4.设置背景颜色
@@ -279,11 +280,10 @@ typedef struct {
             frame.origin.x = x;
             lastView.frame = frame;
         }
-        
     }
     CGFloat contentW = CGRectGetMaxX(lastView.frame) + firstX;
     self.mainView.contentSize = CGSizeMake(contentW, 0);
-    
+    _itemsTotalWidth = itemTotalWidth;
     return itemTotalWidth;
 }
 
@@ -301,7 +301,6 @@ typedef struct {
         self.indicatorView = view;
     }
     else {
-        
         UIView *view = [self getCustomIndicatorView];
         [self.mainView addSubview:view];
         CGFloat ch = CGRectGetHeight(view.frame);
@@ -318,15 +317,44 @@ typedef struct {
         
         self.indicatorView = view;
     }
-    
 }
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    [self resetLayout];
+}
+- (void)resetLayout
+{
+    //1.设置frame
+    self.mainView.frame = self.bounds;
+    //2.设置等距分布
+    if (self.config.equallySpaceWhenItemsWidthLessThanTitleWidth) {
+        [self setupItemEquallySpaceWithItemTotalWidth:_itemsTotalWidth];
+    }
+    //3.是否显示指示器
+    BOOL showIndicator = self.indicatorStyle != WYPageTitleIndicatorViewStyleNone;
+    //4.设置指示器view的frame
+    if (showIndicator) {//显示指示器
+        //设置指示器frame
+        [self setupIndicatorViewFrameWithIndicatorW:_indicatorWidth];
+    }
+}
+
+/**
+ 设置UI
+ */
 - (void)setupUI
 {
     if (self.titles == nil || self.titles.count == 0) return;
     // 1.设置mainView的frame
     self.mainView.frame = self.bounds;
+    if (@available(iOS 11.0, *)) {
+        self.mainView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    } else {
+        // Fallback on earlier versions
+    }
     // 2.按钮的高度
-    CGFloat itemH = self.mainView.bounds.size.height;
+    CGFloat itemH = self.config.titleViewHeight;
    
     // 3.创建指示器
     if (_indicatorStyle != WYPageTitleIndicatorViewStyleNone) {
@@ -342,7 +370,7 @@ typedef struct {
         
         // 3.2 根据指示器高度计算按钮的高度
         if (self.config.indicatorPositionStyle != WYPageTitleIndicatorViewPositionStyleCenter) {
-            itemH = self.mainView.bounds.size.height - _indicatorHeight;
+            itemH = itemH - _indicatorHeight;
         }
     }
     // 4.创建标题 并计算按钮的总宽度
@@ -436,9 +464,11 @@ typedef struct {
     
     CGFloat contentW = CGRectGetMaxX(self.itemArray.lastObject.frame) + firstX;
     
-    if (contentW < self.mainView.frame.size.width) {
+    CGFloat mainW = CGRectGetWidth(self.mainView.frame);
+    
+    if (contentW < mainW) {
         
-        CGFloat residue = self.mainView.frame.size.width - itemTotalWidth - self.itemArray.firstObject.frame.origin.x - firstX;
+        CGFloat residue = mainW - itemTotalWidth - self.itemArray.firstObject.frame.origin.x - firstX;
         
         CGFloat margin = residue / (self.itemArray.count - 1);
         
@@ -541,17 +571,20 @@ typedef struct {
     else {
         [self resetContentOffset:0];
     }
-    //6.变化字体
+    //6.变化字体大小
     if (self.config.canZoomTitle) {
         CGFloat zoom = self.config.titleZoomMultiple;
         BOOL animation = self.config.titleAnimationEnable;
         if (animation) {
             animation = self.config.titleAnimationDuration > 0.0;
         }
+        
         if (animation) {
             [UIView animateWithDuration:self.config.titleAnimationDuration animations:^{
                 [self zoomTitleWithSender:oldBtn scale:1.0];
                 [self zoomTitleWithSender:sender scale:zoom];
+            } completion:^(BOOL finished) {
+              
             }];
         }
         else {
@@ -561,20 +594,22 @@ typedef struct {
     }
     
     
-    //7. 调整滑块位置
+    //7. 调整指示器位置
     if (_indicatorStyle != WYPageTitleIndicatorViewStyleNone) {
         BOOL animation = self.config.titleAnimationEnable;
         if (animation) {
             animation = self.config.titleAnimationDuration > 0.0;
         }
-        if (animation) {
-            [UIView animateWithDuration:self.config.titleAnimationDuration animations:^{
-                [self resetIndicatorViewOriginWithSender:sender];
-            }];
-        }
-        else {
-            [self resetIndicatorViewOriginWithSender:sender];
-        }
+//        if (animation) {
+//            [UIView animateWithDuration:self.config.titleAnimationDuration animations:^{
+//                [self resetIndicatorViewOriginWithSender:sender];
+//            }];
+//        }
+//        else {
+//            [self resetIndicatorViewOriginWithSender:sender];
+//        }
+//
+        [self setupClickIndicatorViewMoveAnimation:animation sourceBtn:oldBtn targetBtn:sender];
     }
     
     //8.记录当前item
@@ -582,8 +617,6 @@ typedef struct {
         //记录当前的item
         _currentItem = sender;
     }
-    
-    
     //9.记录当前item的index
     NSInteger oldIndex = _currentIndex;
     _currentIndex = index;
@@ -595,11 +628,131 @@ typedef struct {
 }
 
 /**
+ 设置按钮点击时指示器的value2滑动类型的滑动动画
+
+ @param sourceBtn sourceBtn
+ @param targetBtn targetBtn
+ */
+- (void)configClickItemAnimationValue2WithSourceBtn:(UIButton *)sourceBtn targetBtn:(UIButton *)targetBtn
+{
+    // 1.计算sourceW、targetW
+    CGFloat sourceW = 0;
+    CGFloat targetW = 0;
+    if (self.config.indicatorViewWidthEqualToItemWidth) {
+        // 指示器宽度等于按钮的宽度
+        sourceW = sourceBtn.frame.size.width;
+        targetW = targetBtn.frame.size.width;
+    }
+    else {
+        // 自定义的宽度
+        sourceW = targetW = _indicatorWidth;
+    }
+    // 2.获取originX
+    CGFloat sourceBtnOrigin = sourceBtn.frame.origin.x;
+    CGFloat targetBtnOrigin = targetBtn.frame.origin.x;
+    
+    // 3.指示器的最大宽度
+    CGFloat maxIndicatorW = 0;
+    // 4.获取动画时间
+    NSTimeInterval duration = self.config.titleAnimationDuration;
+    NSTimeInterval halfDuration = duration * 0.5;
+    //5.滑向右边
+    if (targetBtnOrigin > sourceBtnOrigin) {//向右移动
+        //5.1 计算值
+        CGFloat targetRight = targetBtn.center.x + targetW * 0.5;
+        CGFloat sourceLeft = sourceBtn.center.x - sourceW * 0.5;
+        
+        //5.2 计算下划线最大宽度
+        maxIndicatorW = targetRight - sourceLeft;
+        //5.3 开始动画
+        [UIView animateWithDuration:halfDuration animations:^{
+            //指示器的变化: x不变 宽度增加
+            CGRect frame = self.indicatorView.frame;
+            frame.size.width = maxIndicatorW;
+            self.indicatorView.frame = frame;
+            
+        } completion:^(BOOL finished) {
+            //指示器的变化: maxX不变 宽度减小
+            if (finished) {
+                [UIView animateWithDuration:halfDuration animations:^{
+                    CGRect frame = self.indicatorView.frame;
+                    frame.size.width = targetW;
+                    frame.origin.x = targetBtnOrigin;
+                    self.indicatorView.frame = frame;
+                }];
+            }
+        }];
+    }
+    else {//6. 向左移动
+        
+        //6.1 计算值
+        CGFloat targetLeft = targetBtn.center.x - targetW * 0.5;
+        CGFloat sourceRight = sourceBtn.center.x + sourceW * 0.5;
+        
+        //6.2 计算指示器最大宽度
+        maxIndicatorW = sourceRight - targetLeft;
+        
+        CGFloat indicatorMaxX = CGRectGetMaxX(_indicatorView.frame);
+        [UIView animateWithDuration:halfDuration animations:^{
+            //指示器的变化: right不变 宽度增加
+            CGRect frame = self.indicatorView.frame;
+            frame.size.width = maxIndicatorW;
+            frame.origin.x = indicatorMaxX - frame.size.width;
+            self.indicatorView.frame = frame;
+            
+        } completion:^(BOOL finished) {
+            //指示器的变化: x不变 宽度减小
+            if (finished) {
+                [UIView animateWithDuration:halfDuration animations:^{
+                    CGRect frame = self.indicatorView.frame;
+                    frame.size.width = targetW;
+                    frame.origin.x = targetBtnOrigin;
+                    self.indicatorView.frame = frame;
+                }];
+            }
+        }];
+    }
+}
+
+/**
+ 设置点击按钮时 指示器的滑动动画
+
+ @param animation 是否有动画
+ @param sourceBtn sourceBtn
+ @param targetBtn targetBtn
+ */
+- (void)setupClickIndicatorViewMoveAnimation:(BOOL)animation
+                              sourceBtn:(UIButton *)sourceBtn
+                              targetBtn:(UIButton *)targetBtn
+{
+    // 1.获取滚动动画类型
+    WYIndicatorScrollAnimation scrollAnimation = self.config.indicatorViewScrollAnimation;
+
+    // 2.获取动画时间
+    NSTimeInterval duration = self.config.titleAnimationDuration;
+    
+    // 3. 有动画
+    if (animation) {
+        // 3.1 动画二
+        if (scrollAnimation == WYIndicatorScrollAnimationValue2) {
+            [self configClickItemAnimationValue2WithSourceBtn:sourceBtn targetBtn:targetBtn];
+            return;
+        }
+        // 3.2 动画一类型（默认类型 自定义类型都以这种发式实现）
+        [UIView animateWithDuration:duration animations:^{
+            [self resetIndicatorViewOriginWithSender:targetBtn];
+        }];
+    }
+    else {
+        // 没有动画
+        [self resetIndicatorViewOriginWithSender:targetBtn];
+    }
+}
+/**
  清除内容
  */
 - (void)clearData
 {
-    
     [self.itemArray removeAllObjects];
     [self removeAllSubViewsWithSuperView:self.mainView];
     self.titles = nil;

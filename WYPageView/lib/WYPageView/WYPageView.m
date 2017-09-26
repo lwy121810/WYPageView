@@ -7,17 +7,14 @@
 //
 
 #import "WYPageView.h"
-#import "WYPageConetentView.h"
 
 @interface WYPageView ()<WYPageTitleViewDelegate, WYPageConetentViewDelegate>
 
-@property (weak, nonatomic) WYPageTitleView *titleView;
-@property (weak, nonatomic) WYPageConetentView *contentView;
-
+@property (strong, nonatomic) WYPageTitleView *titleView;
+@property (strong, nonatomic) WYPageConetentView *contentView;
 @property (weak, nonatomic) UIViewController *parentViewController;
 @property (strong, nonatomic) NSArray *childVcs;
 @property (strong, nonatomic) NSArray *titlesArray;
-
 @property (nonatomic , strong) WYPageConfig *config;
 
 @end
@@ -55,6 +52,7 @@
     }
     return _contentView;
 }
+
 - (instancetype)initWithFrame:(CGRect)frame
                      childVcs:(NSArray *)childVcs
          parentViewController:(UIViewController *)parentViewController
@@ -65,7 +63,7 @@
     return self;
 }
 - (void)dealloc {
-    WYLog(@"WYPageView--销毁");
+    WYLog(@"WYPageView ---> dealloc 销毁");
 }
 - (instancetype)initWithFrame:(CGRect)frame
                      childVcs:(NSArray *)childVcs
@@ -90,6 +88,44 @@
     return self;
 }
 
+/**
+ 初始化 可在初始化之后再赋值frame
+ 
+ @param childVcs 子控制器数组 （需有标题）
+ @param parentViewController 父控制器
+ @param config 配置 可以为nil 当为nil时会使用默认配置
+ @return self
+ */
+- (instancetype)initWithChildVcs:(NSArray *)childVcs
+            parentViewController:(UIViewController *)parentViewController
+                      pageConfig:(WYPageConfig *)config
+{
+    if (self = [super init]) {
+        [self setupWithChildVcs:childVcs titles:nil parentViewController:parentViewController pageConfig:config];
+    }
+    return self;
+}
+
+
+/**
+ 初始化 可在初始化之后再赋值frame
+ 
+ @param childVcs 控制器数组
+ @param titles 标题数组
+ @param parentViewController 父控制器
+ @param config 配置 可以为nil 当为nil时会使用默认配置
+ @return self
+ */
+- (instancetype)initWithChildVcs:(NSArray *)childVcs
+                          titles:(NSArray *)titles
+            parentViewController:(UIViewController *)parentViewController
+                      pageConfig:(WYPageConfig *)config
+{
+    if (self = [super init]) {
+        [self setupWithChildVcs:childVcs titles:titles parentViewController:parentViewController pageConfig:config];
+    }
+    return self;
+}
 /**
  初始化 默认配置
  
@@ -202,9 +238,23 @@
 {
     self.childVcs = childVcs;
     self.parentViewController = parentViewController;
+   
+    if (@available(iOS 11.0, *)) {
+        
+    } else {
+        // Fallback on earlier versions
+        if (parentViewController.automaticallyAdjustsScrollViewInsets) {
+            parentViewController.automaticallyAdjustsScrollViewInsets = NO;
+        }
+    }
+
+#ifdef __IPHONE_11_0
+
+#else
     if (parentViewController.automaticallyAdjustsScrollViewInsets) {
         parentViewController.automaticallyAdjustsScrollViewInsets = NO;
     }
+#endif
     
     if (config == nil) {
         config = [[WYPageConfig alloc] init];
@@ -224,6 +274,8 @@
     
     [self setupView];
 }
+
+
 - (void)setupDataWithHaveTitles:(BOOL)haveTitles {
     NSMutableArray *tempTitles = [NSMutableArray array];
     for (UIViewController *childVc in self.childVcs) {
@@ -257,6 +309,32 @@
     self.contentView.backgroundColor = [UIColor whiteColor];
 }
 
+- (void)setFrame:(CGRect)frame
+{
+    [super setFrame:frame];
+    
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    [self setupLayout];
+}
+- (void)setupLayout
+{
+    CGFloat headerH = self.config.titleViewHeight;
+    CGRect headerFrame = CGRectMake(0, 0, self.bounds.size.width, headerH);
+    self.titleView.frame = headerFrame;
+    
+    self.titleView.backgroundColor = [UIColor redColor];
+    
+    CGFloat contentY = CGRectGetMaxY(self.titleView.frame);
+    CGFloat contentH = self.frame.size.height - contentY;
+    CGRect frame = CGRectMake(0, contentY, self.frame.size.width, contentH);
+    self.contentView.frame = frame;
+    self.contentView.backgroundColor = [UIColor blueColor];
+}
 - (void)setCurrentSelectedIndex:(NSInteger)currentSelectedIndex
 {
     if (_currentSelectedIndex == currentSelectedIndex) return;
@@ -289,7 +367,10 @@
 }
 
 #pragma mark - WYPageConetentViewDelegate
-- (void)pageContentView:(WYPageConetentView *)pageContentView scrollWithProgress:(double)progress sourceIndex:(NSInteger)sourceIndex targetIndex:(NSInteger)targetIndex
+- (void)pageContentView:(WYPageConetentView *)pageContentView
+     scrollWithProgress:(double)progress
+            sourceIndex:(NSInteger)sourceIndex
+            targetIndex:(NSInteger)targetIndex
 {
     [self.titleView setTitleWithProgress:progress sourceIndex:sourceIndex targetIndex:targetIndex];
 }

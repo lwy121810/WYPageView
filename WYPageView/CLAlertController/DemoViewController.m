@@ -6,12 +6,12 @@
 //
 //
 /*
- *********************************************************************************
+ ********************************************************
  *
  * GitHub: https://github.com/lwy121810
  * 简书地址: http://www.jianshu.com/u/308baa12e8b5
  *
- *********************************************************************************
+ ********************************************************
  */
 #import "DemoViewController.h"
 #import "WYPageView.h"
@@ -21,6 +21,11 @@
 #import "FourViewController.h"
 #import "FiveViewController.h"
 #import "SixViewController.h"
+
+#define VIEWSAFEAREAINSETS(view) ({UIEdgeInsets i; if(@available(iOS 11.0, *)) {i = view.safeAreaInsets;} else {i = UIEdgeInsetsZero;} i;})
+
+#define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
+#define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
 
 @interface DemoViewController ()
 
@@ -37,19 +42,43 @@
     self.view.backgroundColor = [UIColor whiteColor];
     
     NSArray *vcs = [self setupChildVcAndTitle];
+    //    NSArray *vcs = [self getChildrenVcs];
     
     CGRect frame = self.view.frame;
     if (self.navigationController) {
-        frame.origin.y = 64;
+        CGFloat y = 64;
+        frame.origin.y = y;
     }
     
+
+    //初始化1 给一个空的frame
+    //WYPageView *page = [[WYPageView alloc] initWithFrame:CGRectZero childVcs:vcs parentViewController:self pageConfig:_config];
     
-    WYPageView *page = [[WYPageView alloc] initWithFrame:frame childVcs:vcs parentViewController:self pageConfig:_config];
+    //初始化2 初始化的时候就赋值frame
+    //WYPageView *page = [[WYPageView alloc] initWithFrame:frame childVcs:vcs parentViewController:self pageConfig:_config];
+    //初始化3 没有frame的初始化方法
+    WYPageView *page = [[WYPageView alloc] initWithChildVcs:vcs parentViewController:self pageConfig:_config];
+    
     [self.view addSubview:page];
     
     self.pageView = page;
     
+    self.pageView.frame = frame;
+    
     [self setupBarItems];
+}
+
+//适配iOS 11
+//- (void)viewSafeAreaInsetsDidChange在UIViewController中第一次调用的时间是在- (void)viewWillAppear:(BOOL)animated调用之后, 在- (void)viewWillLayoutSubviews调用之前.
+- (void)viewSafeAreaInsetsDidChange
+{
+    [super viewSafeAreaInsetsDidChange];
+    UIEdgeInsets safeAreaInsets =  self.view.safeAreaInsets;
+    CGRect frame = self.view.frame;
+    frame.origin.y = safeAreaInsets.top;
+    frame.size.height = frame.size.height - safeAreaInsets.top - safeAreaInsets.bottom;
+    frame.origin.x = 0;
+    self.pageView.frame = frame;
 }
 - (void)setupBarItems
 {
@@ -58,7 +87,16 @@
     
     UIBarButtonItem *right2 = [[UIBarButtonItem alloc] initWithTitle:@"其他" style:UIBarButtonItemStyleDone target:self action:@selector(otherAction)];
     
+    
+    //    UIBarButtonItem *right3 = [[UIBarButtonItem alloc] initWithTitle:@"changeFrame" style:UIBarButtonItemStyleDone target:self action:@selector(changeFrame)];
+    
     self.navigationItem.rightBarButtonItems = @[right1, right2];
+}
+- (void)changeFrame
+{
+    CGRect frame = self.pageView.frame;
+    frame.size.height = 400;
+    self.pageView.frame = frame;
 }
 
 
@@ -105,7 +143,7 @@
 {
     UIView *customView = [[UIView alloc] init];
     switch (self.customStyle) {
-        case WYCustomIndicatorViewStyle1://
+        case WYCustomIndicatorViewStyle1://遮罩模式
         {
             // 这里之所以设置宽度为0 是因为设置了config的指示器宽度等于按钮的宽度
             customView.frame = CGRectMake(0, 0, 0, 30);
@@ -129,19 +167,21 @@
     return customView;
 }
 
-
-
-
 - (void)otherAction
 {
+    NSArray *childVcs = [self getChildrenVcs];
     
+    [self.pageView reloadChildrenControllers:childVcs];
+}
+- (NSArray *)getChildrenVcs
+{
     UIViewController *vc1 = [UIViewController new];
     vc1.view.backgroundColor = [UIColor redColor];
     vc1.title = @"头条";
     
     UIViewController *vc2 = [UIViewController new];
     vc2.view.backgroundColor = [UIColor greenColor];
-    vc2.title = @"视频";
+    vc2.title = @"人走茶就凉了";
     
     UIViewController *vc3 = [UIViewController new];
     vc3.view.backgroundColor = [UIColor yellowColor];
@@ -168,10 +208,8 @@
     vc8.title = @"易城live";
     
     NSArray *childVcs = [NSArray arrayWithObjects:vc1, vc2, vc3, vc4, vc5, vc6, vc7,vc8,nil];
-    
-    [self.pageView reloadChildrenControllers:childVcs];
+    return childVcs;
 }
-
 
 - (void)randomReloadAction
 {
@@ -201,10 +239,12 @@
     
     NSMutableArray *childs = @[].mutableCopy;
     OneViewController *vc1 = [[OneViewController alloc] init];
+    //    vc1.title = @"头条";
     vc1.title = @"vc1";
     [childs addObject:vc1];
     
     TwoViewController *vc2 = [[TwoViewController alloc] init];
+    //    vc2.title = @"人走茶就凉了";
     vc2.title = @"vc2";
     [childs addObject:vc2];
     
@@ -236,3 +276,4 @@
 
 
 @end
+

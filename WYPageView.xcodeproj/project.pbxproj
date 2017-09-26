@@ -19,10 +19,6 @@
 		942E34921F612C19002987A1 /* ThreeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 942E34861F612C19002987A1 /* ThreeViewController.xib */; };
 		942E34931F612C19002987A1 /* TwoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E34881F612C19002987A1 /* TwoViewController.m */; };
 		942E34941F612C19002987A1 /* TwoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 942E34891F612C19002987A1 /* TwoViewController.xib */; };
-		942E349E1F612C9D002987A1 /* WYPageConetentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E34971F612C9D002987A1 /* WYPageConetentView.m */; };
-		942E349F1F612C9D002987A1 /* WYPageConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E34991F612C9D002987A1 /* WYPageConfig.m */; };
-		942E34A01F612C9D002987A1 /* WYPageTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E349B1F612C9D002987A1 /* WYPageTitleView.m */; };
-		942E34A11F612C9D002987A1 /* WYPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E349D1F612C9D002987A1 /* WYPageView.m */; };
 		942E351B1F613CBD002987A1 /* OneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E35191F613CBD002987A1 /* OneViewController.m */; };
 		942E351C1F613CBD002987A1 /* OneViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 942E351A1F613CBD002987A1 /* OneViewController.xib */; };
 		945FF6261F628893007C0B51 /* lwy1.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 945FF6251F628893007C0B51 /* lwy1.jpeg */; };
@@ -45,6 +41,10 @@
 		94BDC8E71F5FED410073A97D /* CLAlertModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 94BDC8DD1F5FED410073A97D /* CLAlertModel.m */; };
 		94BDC8E81F5FED410073A97D /* CLAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 94BDC8DF1F5FED410073A97D /* CLAlertView.m */; };
 		94BDC8E91F5FED410073A97D /* UIViewController+CLAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 94BDC8E11F5FED410073A97D /* UIViewController+CLAlertController.m */; };
+		94C7DF0B1F7A02B20000259D /* WYPageConetentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 94C7DF091F7A02130000259D /* WYPageConetentView.m */; };
+		94C7DF0C1F7A02B20000259D /* WYPageConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 94C7DF051F7A02120000259D /* WYPageConfig.m */; };
+		94C7DF0D1F7A02B20000259D /* WYPageTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 94C7DF0A1F7A02130000259D /* WYPageTitleView.m */; };
+		94C7DF0E1F7A02B20000259D /* WYPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 94C7DF071F7A02130000259D /* WYPageView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,14 +84,6 @@
 		942E34871F612C19002987A1 /* TwoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwoViewController.h; sourceTree = "<group>"; };
 		942E34881F612C19002987A1 /* TwoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwoViewController.m; sourceTree = "<group>"; };
 		942E34891F612C19002987A1 /* TwoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TwoViewController.xib; sourceTree = "<group>"; };
-		942E34961F612C9D002987A1 /* WYPageConetentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYPageConetentView.h; sourceTree = "<group>"; };
-		942E34971F612C9D002987A1 /* WYPageConetentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYPageConetentView.m; sourceTree = "<group>"; };
-		942E34981F612C9D002987A1 /* WYPageConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYPageConfig.h; sourceTree = "<group>"; };
-		942E34991F612C9D002987A1 /* WYPageConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYPageConfig.m; sourceTree = "<group>"; };
-		942E349A1F612C9D002987A1 /* WYPageTitleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYPageTitleView.h; sourceTree = "<group>"; };
-		942E349B1F612C9D002987A1 /* WYPageTitleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYPageTitleView.m; sourceTree = "<group>"; };
-		942E349C1F612C9D002987A1 /* WYPageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WYPageView.h; sourceTree = "<group>"; };
-		942E349D1F612C9D002987A1 /* WYPageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WYPageView.m; sourceTree = "<group>"; };
 		942E35181F613CBD002987A1 /* OneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OneViewController.h; sourceTree = "<group>"; };
 		942E35191F613CBD002987A1 /* OneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OneViewController.m; sourceTree = "<group>"; };
 		942E351A1F613CBD002987A1 /* OneViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OneViewController.xib; sourceTree = "<group>"; };
@@ -131,6 +123,14 @@
 		94BDC8DF1F5FED410073A97D /* CLAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLAlertView.m; sourceTree = "<group>"; };
 		94BDC8E01F5FED410073A97D /* UIViewController+CLAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CLAlertController.h"; sourceTree = "<group>"; };
 		94BDC8E11F5FED410073A97D /* UIViewController+CLAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CLAlertController.m"; sourceTree = "<group>"; };
+		94C7DF031F7A02120000259D /* WYPageTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYPageTitleView.h; sourceTree = "<group>"; };
+		94C7DF041F7A02120000259D /* WYPageConetentView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYPageConetentView.h; sourceTree = "<group>"; };
+		94C7DF051F7A02120000259D /* WYPageConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYPageConfig.m; sourceTree = "<group>"; };
+		94C7DF061F7A02130000259D /* WYPageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYPageView.h; sourceTree = "<group>"; };
+		94C7DF071F7A02130000259D /* WYPageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYPageView.m; sourceTree = "<group>"; };
+		94C7DF081F7A02130000259D /* WYPageConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYPageConfig.h; sourceTree = "<group>"; };
+		94C7DF091F7A02130000259D /* WYPageConetentView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYPageConetentView.m; sourceTree = "<group>"; };
+		94C7DF0A1F7A02130000259D /* WYPageTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYPageTitleView.m; sourceTree = "<group>"; };
 		E766409E9BBFECAB279A4F7B /* libPods-WYPageView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WYPageView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -205,14 +205,14 @@
 		942E34951F612C9D002987A1 /* WYPageView */ = {
 			isa = PBXGroup;
 			children = (
-				942E349C1F612C9D002987A1 /* WYPageView.h */,
-				942E349D1F612C9D002987A1 /* WYPageView.m */,
-				942E349A1F612C9D002987A1 /* WYPageTitleView.h */,
-				942E349B1F612C9D002987A1 /* WYPageTitleView.m */,
-				942E34961F612C9D002987A1 /* WYPageConetentView.h */,
-				942E34971F612C9D002987A1 /* WYPageConetentView.m */,
-				942E34981F612C9D002987A1 /* WYPageConfig.h */,
-				942E34991F612C9D002987A1 /* WYPageConfig.m */,
+				94C7DF041F7A02120000259D /* WYPageConetentView.h */,
+				94C7DF091F7A02130000259D /* WYPageConetentView.m */,
+				94C7DF081F7A02130000259D /* WYPageConfig.h */,
+				94C7DF051F7A02120000259D /* WYPageConfig.m */,
+				94C7DF031F7A02120000259D /* WYPageTitleView.h */,
+				94C7DF0A1F7A02130000259D /* WYPageTitleView.m */,
+				94C7DF061F7A02130000259D /* WYPageView.h */,
+				94C7DF071F7A02130000259D /* WYPageView.m */,
 			);
 			path = WYPageView;
 			sourceTree = "<group>";
@@ -525,24 +525,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94C7DF0B1F7A02B20000259D /* WYPageConetentView.m in Sources */,
+				94C7DF0C1F7A02B20000259D /* WYPageConfig.m in Sources */,
+				94C7DF0D1F7A02B20000259D /* WYPageTitleView.m in Sources */,
+				94C7DF0E1F7A02B20000259D /* WYPageView.m in Sources */,
 				942E348A1F612C19002987A1 /* FiveViewController.m in Sources */,
 				94BDC8E81F5FED410073A97D /* CLAlertView.m in Sources */,
 				94A338A41F41411E00958421 /* ViewController.m in Sources */,
 				94BDC8E71F5FED410073A97D /* CLAlertModel.m in Sources */,
 				94BDC8E41F5FED410073A97D /* CLAlertDefaultTableViewCell.m in Sources */,
-				942E34A11F612C9D002987A1 /* WYPageView.m in Sources */,
 				94BDC8E51F5FED410073A97D /* CLAlertDestructiveTableViewCell.m in Sources */,
 				94BDC8E91F5FED410073A97D /* UIViewController+CLAlertController.m in Sources */,
 				94BDC8E61F5FED410073A97D /* CLAlertDoubleTableViewCell.m in Sources */,
 				942E351B1F613CBD002987A1 /* OneViewController.m in Sources */,
 				94BDC8E31F5FED410073A97D /* CLAlertController.m in Sources */,
-				942E349F1F612C9D002987A1 /* WYPageConfig.m in Sources */,
-				942E34A01F612C9D002987A1 /* WYPageTitleView.m in Sources */,
 				94A338A11F41411E00958421 /* AppDelegate.m in Sources */,
 				942E34911F612C19002987A1 /* ThreeViewController.m in Sources */,
 				94BDC8E21F5FED410073A97D /* CLAlertCancelTableViewCell.m in Sources */,
 				942E348F1F612C19002987A1 /* SixViewController.m in Sources */,
-				942E349E1F612C9D002987A1 /* WYPageConetentView.m in Sources */,
 				94A3389E1F41411E00958421 /* main.m in Sources */,
 				942E34931F612C19002987A1 /* TwoViewController.m in Sources */,
 				942E348C1F612C19002987A1 /* FourViewController.m in Sources */,
@@ -642,7 +642,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -685,7 +685,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";

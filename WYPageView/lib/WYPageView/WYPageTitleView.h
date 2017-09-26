@@ -70,7 +70,10 @@
  @param dataSource 数据源
  @return self
  */
-- (instancetype)initWithFrame:(CGRect)frame titles:(NSArray <NSString *>*)titles config:(WYPageConfig *)config dataSource:(id<WYPageTitleViewDataSource>)dataSource;
+- (instancetype)initWithFrame:(CGRect)frame
+                       titles:(NSArray <NSString *>*)titles
+                       config:(WYPageConfig *)config
+                   dataSource:(id<WYPageTitleViewDataSource>)dataSource;
 
 
 

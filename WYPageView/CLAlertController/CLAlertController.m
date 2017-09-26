@@ -88,7 +88,24 @@
     return _alertItems;
 }
 
-
+- (void)viewSafeAreaInsetsDidChange
+{
+    [super viewSafeAreaInsetsDidChange];
+    
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    UIEdgeInsets inset = window.safeAreaInsets;
+    CGFloat y      = [UIScreen mainScreen].bounds.size.height;
+    
+    CGFloat height = self.tableView.frame.size.height;
+    CGRect frame = self.tableView.frame;
+    frame.origin.y = y - height - inset.bottom;
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        
+        self.tableView.frame = frame;
+        self.bgView.alpha = 0.2;
+    }];
+}
 - (void)addAction:(CLAlertModel *)action {
     
     self.itemCount ++;
@@ -300,7 +317,7 @@
         [_tableView registerClass:[CLAlertCancelTableViewCell class] forCellReuseIdentifier:@"cancel"];
         [_tableView registerClass:[CLAlertDefaultTableViewCell class] forCellReuseIdentifier:@"default"];
         [_tableView registerClass:[CLAlertDestructiveTableViewCell class] forCellReuseIdentifier:@"destructive"];
-        
+        _tableView.estimatedSectionFooterHeight = 0;
     }
     
     return _tableView;
@@ -562,3 +579,4 @@ BOOL isEmptyString(NSString *string) {
 
 
 @end
+

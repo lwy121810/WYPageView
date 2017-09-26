@@ -15,7 +15,6 @@
 @property (nonatomic , strong) UIScrollView *scrollView;
 @property (nonatomic , assign) NSInteger currentIndex;
 @property (nonatomic , strong) NSMutableArray *viewControllers;
-
 @property (nonatomic , weak) UIViewController *parentController;
 /**
  标记是不是点击事件
@@ -93,6 +92,12 @@
 - (void)setupView
 {
     self.scrollView.frame = self.bounds;
+
+    if (@available(iOS 11.0, *)) {
+        self.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    } else {
+        // Fallback on earlier versions
+    }
     
     CGFloat contentSize = self.viewControllers.count * self.scrollView.frame.size.width;
     
@@ -102,13 +107,42 @@
     
     CGFloat offset = _currentIndex * CGRectGetWidth(self.scrollView.frame);
     
+    //手动设置contentOffset会出发其代理方法 会导致手动设置index不准确 应该禁止其代理方法实现
+    _isForbidScrollDelegate = YES;
     self.scrollView.contentOffset = CGPointMake(offset, 0);
     
     UIViewController *vc = [self getChildrenControllerWithIndex:_currentIndex];
     
     [self addChildViewController:vc atIndex:_currentIndex];
 }
-
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    if (CGRectEqualToRect(self.scrollView.frame, self.bounds)) {
+        return;
+    }
+    [self resetLayout];
+}
+- (void)resetLayout
+{
+    self.scrollView.frame = self.bounds;
+    
+    CGFloat contentSize = self.viewControllers.count * self.scrollView.frame.size.width;
+    
+    self.scrollView.contentSize = CGSizeMake(contentSize, 0);
+    
+    CGFloat offset = _currentIndex * CGRectGetWidth(self.scrollView.frame);
+    
+    //手动设置contentOffset会出发其代理方法 会导致手动设置index不准确 应该禁止其代理方法实现
+    self.scrollView.contentOffset = CGPointMake(offset, 0);
+    
+    //获取到当前的控制器 调整控制器view的frame
+    UIViewController *childController = [self getCurrentController];
+    CGRect frame = self.scrollView.bounds;
+    frame.origin.x = _currentIndex * self.scrollView.frame.size.width;
+    childController.view.frame = frame;
+}
 
 /**
  移除控制器，且从display中移除
@@ -227,7 +261,7 @@
     [superView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
 }
 - (void)dealloc {
-    WYLog(@"WYPageContentView---销毁");
+    WYLog(@"WYPageContentView ---> dealloc  销毁");
 }
 
 #pragma mark - private
@@ -314,7 +348,6 @@
 {
     //标记不是点击事件
     _isForbidScrollDelegate = NO;
-    
     _currentIndex = [self getCurrentIndex:scrollView];
     //标记开始的偏移量
     _startOffsetX = scrollView.contentOffset.x;

@@ -61,7 +61,7 @@
         
         self.contentScrollEnabled = YES;
         
-        self.itemWidth = 80.f;
+        self.itemWidth = 100.f;
         
         self.defaultSelectedIndex = 0;
     }

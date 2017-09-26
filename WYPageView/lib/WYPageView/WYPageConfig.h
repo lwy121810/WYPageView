@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 
 //开启debug 开启之后会检查传入的数据（vc是否包含导航栏，vc数量是否与title数量一致等）
-//#define WYDEBUG
+#define WYDEBUG
 
 #ifdef WYDEBUG
 #define WYLog(s, ... ) NSLog( @"[%@ in line %d] ===============>%@", [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
@@ -25,7 +25,7 @@
 #define RGBA(R,G,B,A)	[UIColor colorWithRed:R/255.0f green:G/255.0f blue:B/255.0f alpha:A]
 
 /**
- 在拖拽contentView时、指示器的滚动效果
+ 在拖拽contentView和点击标题时、指示器的滚动效果
 
  - WYIndicatorScrollAnimationNone: 无动画、在拖拽结束后指示器移动到目标位置
  - WYIndicatorScrollAnimationValue1: 默认动画、在拖拽时滑块的x随拖拽而变化；指示器的宽度随着拖拽进度渐变到跟下一个item的宽度相等（如果设置的'indicatorViewWidthEqualToItemWidth'为NO,滑块的宽度将不会变化、只变化滑块的x）
@@ -191,7 +191,7 @@ typedef NS_ENUM(NSInteger, WYPageSingleTitleTextAlignment) {
 @property (nonatomic , assign) CGFloat titleEdgeItemDistanceOfView;
 
 /**
- 当按钮的总宽度小于titleView的宽度时，按钮是否等距分布
+ 当按钮的总宽度小于titleView的宽度时，按钮是否等距分布 (不包括按钮之间的间隙 也就是当为‘YES’时 将忽略设置的按钮之间的间隙‘titleMargin’ 但不会忽略‘titleEdgeItemDistanceOfView’)
  */
 @property (nonatomic , assign) BOOL equallySpaceWhenItemsWidthLessThanTitleWidth;
 

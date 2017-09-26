@@ -9,14 +9,30 @@
 #import <UIKit/UIKit.h>
 #import "WYPageConfig.h"
 #import "WYPageTitleView.h"
+#import "WYPageConetentView.h"
 
 @interface WYPageView : UIView
 
+/**
+ 配置信息
+ */
 @property (nonatomic , strong, readonly) WYPageConfig *config;
+
+/**
+ 标题按钮所在的view
+ */
+@property (strong, nonatomic, readonly) WYPageTitleView *titleView;
+
+/**
+ contentView 即控制器view的superView
+ */
+@property (strong, nonatomic, readonly) WYPageConetentView *contentView;
 /**
  当前选中下标
  */
 @property (nonatomic , assign) NSInteger currentSelectedIndex;
+
+
 /**
  初始化 每个控制器需要有自己的标题 默认配置
 
@@ -43,6 +59,33 @@
          parentViewController:(UIViewController *)parentViewController
                    pageConfig:(WYPageConfig *)config;
 
+
+/**
+ 初始化 可在初始化之后再赋值frame
+
+ @param childVcs 子控制器数组 （需有标题）
+ @param parentViewController 父控制器
+ @param config 配置 可以为nil 当为nil时会使用默认配置
+ @return self
+ */
+- (instancetype)initWithChildVcs:(NSArray *)childVcs
+         parentViewController:(UIViewController *)parentViewController
+                   pageConfig:(WYPageConfig *)config;
+
+
+/**
+ 初始化 可在初始化之后再赋值frame
+
+ @param childVcs 控制器数组
+ @param titles 标题数组
+ @param parentViewController 父控制器
+ @param config 配置 可以为nil 当为nil时会使用默认配置
+ @return self
+ */
+- (instancetype)initWithChildVcs:(NSArray *)childVcs
+                       titles:(NSArray *)titles
+         parentViewController:(UIViewController *)parentViewController
+                   pageConfig:(WYPageConfig *)config;
 /**
  初始化
 
