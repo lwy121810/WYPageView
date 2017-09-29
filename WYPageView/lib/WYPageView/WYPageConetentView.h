@@ -44,7 +44,7 @@
 /**
  初始化
 
- @param frame frame
+ @param frame frame 可以为zero 在合适的时间赋值frame
  @param childrenVcs 子控制器数组
  @param parentViewController 父控制器
  @param config 配置
@@ -54,6 +54,18 @@
       childrenViewControllers:(NSArray <UIViewController *> *)childrenVcs
              parentController:(UIViewController *)parentViewController
                        config:(WYPageConfig *)config;
+
+/**
+ 初始化 在合适的时间赋值frame
+ 
+ @param childrenVcs 子控制器数组
+ @param parentViewController 父控制器
+ @param config 配置信息 可以为nil
+ @return self
+ */
+- (instancetype)initWithChildrenViewControllers:(NSArray <UIViewController *>*)childrenVcs
+                               parentController:(UIViewController *)parentViewController
+                                         config:(WYPageConfig *)config;
 
 /**
  设置内容视图偏移量

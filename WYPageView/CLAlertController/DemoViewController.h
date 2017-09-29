@@ -32,14 +32,10 @@
 //                  如今车道依旧在，
 //                  不见当年老司机。
 
-#import <UIKit/UIKit.h>
+#import "DemoBaseViewController.h"
 #import "WYPageView.h"
 
-typedef NS_ENUM(NSInteger, WYCustomIndicatorViewStyle) {
-    WYCustomIndicatorViewStyle1 = 0,
-    WYCustomIndicatorViewStyle2,
-};
-@interface DemoViewController : UIViewController
+@interface DemoViewController : DemoBaseViewController
 
 @property (nonatomic , strong) WYPageConfig *config;
 

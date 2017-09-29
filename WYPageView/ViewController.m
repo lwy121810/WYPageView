@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "DemoViewController.h"
 #import "CLAlertController.h"
-
+#import "NavViewController.h"
 
 
 #define kIndicatorScrollAnimation @{\
@@ -51,6 +51,7 @@
 
 @property (weak, nonatomic) IBOutlet UITextField *defaultSelectedIndexTextField;
 
+@property (weak, nonatomic) IBOutlet UIButton *positionButton;
 @property (nonatomic , assign) WYIndicatorScrollAnimation currentAnimation;
 @property (nonatomic , assign) WYPageTitleIndicatorViewStyle currentIndicatorStyle;
 @property (nonatomic , assign) WYPageTitleIndicatorViewPositionStyle currentPosition;
@@ -70,13 +71,17 @@
     [self showAlertWithTitle:@"指示器动画" index:3 sender:sender];
 }
 
+- (IBAction)pushToNavController:(id)sender {
+    [self.view endEditing:YES];
+    [self nextVcIsDemo:NO];
+}
 
 - (IBAction)push:(id)sender {
     [self.view endEditing:YES];
-    [self nextVc];
+    [self nextVcIsDemo:YES];
 }
 #pragma mark - 跳转到下一个页面
-- (void)nextVc
+- (void)nextVcIsDemo:(BOOL)isDemo
 {
     WYPageConfig *config = [[WYPageConfig alloc] init];
     //1.指示器类型
@@ -128,15 +133,22 @@
     config.defaultSelectedIndex = [self getNumberWithTextField:self.defaultSelectedIndexTextField defaultValue:0];
     
     BOOL isPush = self.isPush.on;
-    
-    DemoViewController *vc = [[DemoViewController alloc] init];
-    vc.config = config;
-    vc.customStyle = _customStyle;
-    if (isPush) {
-        [self.navigationController pushViewController:vc animated:YES];
+    if (isDemo) {
+        DemoViewController *vc = [[DemoViewController alloc] init];
+        vc.config = config;
+        vc.customStyle = _customStyle;
+        if (isPush) {
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+        else {
+            [self presentViewController:vc animated:YES completion:nil];
+        }
     }
     else {
-        [self presentViewController:vc animated:YES completion:nil];
+        NavViewController *vc = [[NavViewController alloc] init];
+        vc.config = config;
+        vc.customStyle = _customStyle;
+        [self.navigationController pushViewController:vc animated:YES];
     }
 }
 - (CGFloat)getNumberWithTextField:(UITextField *)textField defaultValue:(CGFloat)defaultValue
@@ -194,6 +206,7 @@
                         _customStyle = WYCustomIndicatorViewStyle1;
                         self.lineWidthEqualToItemSwitch.on = YES;
                         _currentPosition = WYPageTitleIndicatorViewPositionStyleCenter;
+                        [_positionButton setTitle:@"中间" forState:UIControlStateNormal];
                     }
                     else {//小红点模式
                        _customStyle = WYCustomIndicatorViewStyle2;

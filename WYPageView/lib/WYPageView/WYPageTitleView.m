@@ -66,22 +66,44 @@ typedef struct {
 - (instancetype)initWithFrame:(CGRect)frame titles:(NSArray <NSString *>*)titles config:(WYPageConfig *)config dataSource:(id<WYPageTitleViewDataSource>)dataSource
 {
     if (self = [super initWithFrame:frame]) {
-        self.titles = titles;
-        if (config == nil) {
-            config = [[WYPageConfig alloc] init];
-        }
-        _config = config;
-        _indicatorStyle = config.indicatorStyle;
-        
-        _indicatorHeight = config.indicatorViewHeight;
-        _indicatorWidth = config.indicatorViewWidth;
-        _dataSource = dataSource;
-        [self setupDefaultValue];
-        [self setupUI];
+        [self setupInitDataWithTitles:titles config:config dataSource:dataSource];
     }
     return self;
 }
 
+/**
+ 初始化
+
+ @param frame frame
+ @param titles 标题数组
+ @param config config
+ @return self
+ */
+- (instancetype)initWithFrame:(CGRect)frame
+                       titles:(NSArray<NSString *> *)titles
+                       config:(WYPageConfig *)config
+{
+    if (self = [super initWithFrame:frame]) {
+        [self setupInitDataWithTitles:titles config:config dataSource:nil];
+    }
+    return self;
+}
+- (void)setupInitDataWithTitles:(NSArray *)titles
+                         config:(WYPageConfig *)config
+                     dataSource:(id<WYPageTitleViewDataSource>)dataSource
+{
+    self.titles = titles;
+    if (config == nil) {
+        config = [[WYPageConfig alloc] init];
+    }
+    _config = config;
+    _indicatorStyle = config.indicatorStyle;
+    _indicatorHeight = config.indicatorViewHeight;
+    _indicatorWidth = config.indicatorViewWidth;
+    _dataSource = dataSource;
+    [self setupDefaultValue];
+    [self setupUI];
+}
 - (UIButton *)createButtonWithTitle:(NSString *)title tag:(NSInteger)tag
 {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -475,7 +497,57 @@ typedef struct {
         [self resetItemMargin:margin];
     }
 }
+- (void)setDataSource:(id<WYPageTitleViewDataSource>)dataSource
+{
+    _dataSource = dataSource;
+    if (_indicatorView) {
+        [_indicatorView removeFromSuperview];
+        _indicatorView = nil;
+    }
+    [self setupIndicatorView];
+    [self.mainView sendSubviewToBack:self.indicatorView];
+    [self resetItemsHeight];
+}
+- (void)resetItemsHeight
+{
+    // 2.按钮的高度
+    CGFloat itemH = self.config.titleViewHeight;
 
+    CGFloat y = 0;
+    
+    // 3.创建指示器
+    if (_indicatorStyle != WYPageTitleIndicatorViewStyleNone) {
+        
+        if (_indicatorHeight <= 0) {
+            _indicatorHeight = self.config.indicatorViewHeight;
+        }
+        if (_indicatorWidth <= 0) {
+            _indicatorWidth = self.config.indicatorViewWidth;
+        }
+        
+        // 3.2 根据指示器高度计算按钮的高度
+        if (self.config.indicatorPositionStyle != WYPageTitleIndicatorViewPositionStyleCenter) {
+            itemH = itemH - _indicatorHeight;
+        }
+        WYPageTitleIndicatorViewPositionStyle position = self.config.indicatorPositionStyle;
+        if (position == WYPageTitleIndicatorViewPositionStyleCenter) {
+            
+        }
+        else if (position == WYPageTitleIndicatorViewPositionStyleBottom) {
+            itemH = itemH - _indicatorHeight;
+        }
+        else {//top
+            itemH = itemH - _indicatorHeight;
+            y = _indicatorHeight;
+        }
+    }
+    [self.itemArray enumerateObjectsUsingBlock:^(UIButton * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        CGRect frame = obj.frame;
+        frame.origin.y = y;
+        frame.size.height = itemH;
+        obj.frame = frame;
+    }];
+}
 /**
  获取自定义的指示器view
 
@@ -483,6 +555,9 @@ typedef struct {
  */
 - (UIView *)getCustomIndicatorView
 {
+    if (_dataSource == nil) {
+        return nil;
+    }
     if ([_dataSource respondsToSelector:@selector(customIndicatorViewForPageTitleView:)]) {
         UIView *customView = [_dataSource customIndicatorViewForPageTitleView:self];
 #ifdef WYDEBUG

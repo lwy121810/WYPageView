@@ -63,20 +63,64 @@
     }
     return _viewControllers;
 }
+
+/**
+ 初始化
+
+ @param frame frame 可以为zero 在后续某个时间再赋值
+ @param childrenVcs 子控制器数组
+ @param parentViewController 父控制器
+ @param config 配置信息 可为nil
+ @return self
+ */
 - (instancetype)initWithFrame:(CGRect)frame
       childrenViewControllers:(NSArray <UIViewController *> *)childrenVcs
              parentController:(UIViewController *)parentViewController
                        config:(WYPageConfig *)config
 {
     if (self = [super initWithFrame:frame]) {
-        self.viewControllers = [childrenVcs mutableCopy];
-        self.parentController = parentViewController;
-        self.config = config;
-        self.currentIndex = self.config.defaultSelectedIndex;
-        [self setupView];
+        [self setupInitDataWithChildrenVcs:childrenVcs parentController:parentViewController config:config];
     }
     return self;
 }
+
+/**
+ 初始化
+
+ @param childrenVcs 子控制器数组
+ @param parentViewController 父控制器
+ @param config 配置信息 可以为nil
+ @return self
+ */
+- (instancetype)initWithChildrenViewControllers:(NSArray <UIViewController *>*)childrenVcs
+                               parentController:(UIViewController *)parentViewController
+                                         config:(WYPageConfig *)config
+{
+    if (self = [super init]) {
+        [self setupInitDataWithChildrenVcs:childrenVcs parentController:parentViewController config:config];
+    }
+    return self;
+}
+- (void)setupInitDataWithChildrenVcs:(NSArray *)childrenVcs
+                    parentController:(UIViewController *)parentViewController
+                              config:(WYPageConfig *)config
+{
+    self.viewControllers = [childrenVcs mutableCopy];
+    self.parentController = parentViewController;
+    if (config == nil) {
+        config = [[WYPageConfig alloc] init];
+    }
+    if (parentViewController.automaticallyAdjustsScrollViewInsets) {
+        parentViewController.automaticallyAdjustsScrollViewInsets = NO;
+    }
+    if (childrenVcs == nil || childrenVcs.count == 0) {
+        return;
+    }
+    self.config = config;
+    self.currentIndex = self.config.defaultSelectedIndex;
+    [self setupView];
+}
+
 - (void)setCurrentIndex:(NSInteger)currentIndex
 {
     _currentIndex = currentIndex;
@@ -112,16 +156,13 @@
     self.scrollView.contentOffset = CGPointMake(offset, 0);
     
     UIViewController *vc = [self getChildrenControllerWithIndex:_currentIndex];
-    
+
     [self addChildViewController:vc atIndex:_currentIndex];
 }
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    
-    if (CGRectEqualToRect(self.scrollView.frame, self.bounds)) {
-        return;
-    }
+ 
     [self resetLayout];
 }
 - (void)resetLayout

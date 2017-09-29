@@ -20,7 +20,7 @@
  @param pageTitleView self
  @return 自定义view 如果没有frame 则会按照'config'的
  */
-- (UIView *)customIndicatorViewForPageTitleView:(WYPageTitleView *)pageTitleView;
+- (UIView *)customIndicatorViewForPageTitleView:(WYPageTitleView  *)pageTitleView;
 
 @optional
 
@@ -46,7 +46,9 @@
  @param selectdIndex 当前按钮下标
  @param oldIndex 上一次点击的按钮下标
  */
-- (void)pageTitleView:(WYPageTitleView *)pageTitleView selectdIndexItem:(NSInteger)selectdIndex oldIndex:(NSInteger)oldIndex;
+- (void)pageTitleView:(WYPageTitleView *)pageTitleView
+     selectdIndexItem:(NSInteger)selectdIndex
+             oldIndex:(NSInteger)oldIndex;
 
 @end
 @interface WYPageTitleView : UIView
@@ -61,6 +63,8 @@
  */
 @property (nonatomic , assign) WYPageTitleIndicatorViewStyle indicatorStyle;
 
+/** 指示器view */
+@property (nonatomic , strong, readonly) UIView *indicatorView;
 /**
  初始化
 
@@ -75,6 +79,17 @@
                        config:(WYPageConfig *)config
                    dataSource:(id<WYPageTitleViewDataSource>)dataSource;
 
+/**
+ 初始化
+ 
+ @param frame frame
+ @param titles 标题数组
+ @param config config
+ @return self
+ */
+- (instancetype)initWithFrame:(CGRect)frame
+                       titles:(NSArray<NSString *> *)titles
+                       config:(WYPageConfig *)config;
 
 
 /**

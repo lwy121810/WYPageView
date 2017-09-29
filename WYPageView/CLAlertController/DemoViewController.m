@@ -24,10 +24,8 @@
 
 #define VIEWSAFEAREAINSETS(view) ({UIEdgeInsets i; if(@available(iOS 11.0, *)) {i = view.safeAreaInsets;} else {i = UIEdgeInsetsZero;} i;})
 
-#define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
-#define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
 
-@interface DemoViewController ()
+@interface DemoViewController ()<WYPageTitleViewDataSource>
 
 @property (nonatomic , strong) WYPageView *pageView;
 @end
@@ -44,13 +42,15 @@
     NSArray *vcs = [self setupChildVcAndTitle];
     //    NSArray *vcs = [self getChildrenVcs];
     
+    
+    
+
     CGRect frame = self.view.frame;
     if (self.navigationController) {
         CGFloat y = 64;
         frame.origin.y = y;
     }
-    
-
+    frame.size.height -= frame.origin.y;
     //初始化1 给一个空的frame
     //WYPageView *page = [[WYPageView alloc] initWithFrame:CGRectZero childVcs:vcs parentViewController:self pageConfig:_config];
     
@@ -62,8 +62,12 @@
     [self.view addSubview:page];
     
     self.pageView = page;
-    
-    self.pageView.frame = frame;
+    if (@available(iOS 11.0, *)) {
+        // ios 11之后在‘viewSafeAreaInsetsDidChange’方法里根据‘safeAreaInsets’赋值frame
+    } else {
+        // Fallback on earlier versions
+        self.pageView.frame = frame;
+    }
     
     [self setupBarItems];
 }
@@ -82,7 +86,6 @@
 }
 - (void)setupBarItems
 {
-    
     UIBarButtonItem *right1 = [[UIBarButtonItem alloc] initWithTitle:@"随机数量" style:UIBarButtonItemStyleDone target:self action:@selector(randomReloadAction)];
     
     UIBarButtonItem *right2 = [[UIBarButtonItem alloc] initWithTitle:@"其他" style:UIBarButtonItemStyleDone target:self action:@selector(otherAction)];
