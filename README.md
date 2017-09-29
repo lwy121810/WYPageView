@@ -1,7 +1,10 @@
 # WYPageView
 
-## pod支持
-> pod 'WYPageView'
+## 安装
+* pod
+     > pod 'WYPageView', '~> 1.0.3'
+* 手动
+     > 直接拖拽'WYPageView'文件夹到项目即可
 ## 介绍
  * 自定义指示器宽高
  * 自定义指示器滚动效果
@@ -60,7 +63,4 @@
   
  ## 最后
    * 如果有什么问题欢迎 [issues me](https://github.com/lwy121810/WYPageView/issues) 或者QQ群 ' 479663605 '（iOS 11 前沿技术交流）' 497140713'（SDAutoLayout）联系我，最后，如果对您有帮助，请小小star支持一下☺️☺️
-
-    ，
-    
-    
+   
