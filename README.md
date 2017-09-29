@@ -1,9 +1,9 @@
 # WYPageView
 
 ## 安装
-* pod
+**pod**
      > pod 'WYPageView', '~> 1.0.3'
-* 手动
+**手动**
      > 直接拖拽'WYPageView'文件夹到项目即可
 ## 介绍
  * 自定义指示器宽高
