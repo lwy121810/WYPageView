@@ -1,7 +1,7 @@
 # WYPageView
 
 ## pod支持
-> pod 'WYPageView' 最新版本的pod后续会增加
+> pod 'WYPageView'
 ## 介绍
  * 自定义指示器宽高
  * 自定义指示器滚动效果
@@ -55,6 +55,7 @@
 ![效果图](https://github.com/lwy121810/WYPageView/blob/master/Image/效果图.gif)
 
  ## 更新
+  * 2017-8-29 初始化不再必须传frame 支持ios 11 更新pod版本为'1.0.3'
   * 2017-8-9: 上传新版本（使用scrollView替代collectionView，新增多种自定义效果）
   
  ## 最后
