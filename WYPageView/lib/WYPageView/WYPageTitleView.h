@@ -36,6 +36,7 @@
                                      progress:(double)progress
                                   sourceIndex:(NSInteger)sourceIndex
                                   targetIndex:(NSInteger)targetIndex;
+
 @end
 @protocol WYPageTitleViewDelegate <NSObject>
 

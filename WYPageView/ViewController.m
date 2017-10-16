@@ -30,6 +30,11 @@
 @"中间":@(WYPageTitleIndicatorViewPositionStyleCenter)}
 
 
+#define kSingleTitleAlignment @{\
+@"左边":@(WYPageSingleTitleTextAlignmentLeft),\
+@"中间":@(WYPageSingleTitleTextAlignmentCenter),\
+@"右边":@(WYPageSingleTitleTextAlignmentRight)}
+
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *titleViewHeightText;
@@ -50,21 +55,32 @@
 @property (weak, nonatomic) IBOutlet UISwitch *lineWidthEqualToItemSwitch;
 
 @property (weak, nonatomic) IBOutlet UITextField *defaultSelectedIndexTextField;
+@property (weak, nonatomic) IBOutlet UIButton *singleAlignmentButton;
 
 @property (weak, nonatomic) IBOutlet UIButton *positionButton;
 @property (nonatomic , assign) WYIndicatorScrollAnimation currentAnimation;
 @property (nonatomic , assign) WYPageTitleIndicatorViewStyle currentIndicatorStyle;
 @property (nonatomic , assign) WYPageTitleIndicatorViewPositionStyle currentPosition;
 @property (nonatomic , assign) WYCustomIndicatorViewStyle customStyle;
+@property (nonatomic , assign) WYPageSingleTitleTextAlignment singleAlignment;
+@property (nonatomic , assign) WYIndicatorScrollAnimation clickScrollAnimation;
 @end
 
 @implementation ViewController
+- (IBAction)chooseSingleTitleAlignment:(UIButton *)sender {
+    
+    [self showAlertWithTitle:@"指示器类型" index:4 sender:sender];
+}
 
 - (IBAction)indicatorStyle:(UIButton *)sender {
     [self showAlertWithTitle:@"指示器类型" index:1 sender:sender];
 }
 - (IBAction)setPosition:(UIButton *)sender {
     [self showAlertWithTitle:@"指示器位置" index:2 sender:sender];
+}
+- (IBAction)setIndicatorScrollStyleWhenClickTitle:(UIButton *)sender {
+    
+    [self showAlertWithTitle:@"点击按钮时指示器的动画" index:5 sender:sender];
 }
 
 - (IBAction)setScrollStyle:(UIButton *)sender {
@@ -129,13 +145,18 @@
     
     //20. 滑块宽度是否等于标题宽度
     config.indicatorViewWidthEqualToItemWidth = self.lineWidthEqualToItemSwitch.on;
-    
+    //21. 默认选中下标
     config.defaultSelectedIndex = [self getNumberWithTextField:self.defaultSelectedIndexTextField defaultValue:0];
-    
+    //22. 只有一个标题时 按钮的位置
+    config.singleTitleAlignment = _singleAlignment;
+    //23. 点击标题时 指示器的滚动效果
+    config.indicatorViewScrollAnimationWhenClickTitleItem = _clickScrollAnimation;
+    //
     BOOL isPush = self.isPush.on;
     if (isDemo) {
         DemoViewController *vc = [[DemoViewController alloc] init];
         vc.config = config;
+        
         vc.customStyle = _customStyle;
         if (isPush) {
             [self.navigationController pushViewController:vc animated:YES];
@@ -165,10 +186,12 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    
+    // 设置默认值
     _currentAnimation = WYIndicatorScrollAnimationValue1;
     _currentPosition = WYPageTitleIndicatorViewPositionStyleBottom;
     _currentIndicatorStyle = WYPageTitleIndicatorViewStyleDownLine;
+    _singleAlignment = WYPageSingleTitleTextAlignmentLeft;
+    _clickScrollAnimation = WYIndicatorScrollAnimationValue1;
 }
 
 - (void)showAlertWithTitle:(NSString *)title index:(NSInteger)index sender:(UIButton *)sender
@@ -192,6 +215,17 @@
         }
             break;
             
+        case 4:
+        {
+            titles = [kSingleTitleAlignment allKeys];
+        }
+            break;
+            
+        case 5:
+        {
+            titles = [kIndicatorScrollAnimation allKeys];
+        }
+            break;
         default:
             break;
     }
@@ -229,13 +263,26 @@
             }
                 break;
                 
+            case 4://
+            {
+                _singleAlignment = [[kSingleTitleAlignment valueForKey:actionTitle] integerValue];
+            }
+                break;
+            case 5://
+            {
+                _clickScrollAnimation = [[kIndicatorScrollAnimation valueForKey:actionTitle] integerValue];
+            }
+                break;
+                
             default:
                 break;
         }
     }];
 }
-
-- (void)presentCLSheetVcWithTitle:(NSString *)title itemTitles:(NSArray *)itemTitles action:(void(^)(NSInteger index, NSString *actionTitle))actionBlock
+#pragma mark - 弹出sheet
+- (void)presentCLSheetVcWithTitle:(NSString *)title
+                       itemTitles:(NSArray *)itemTitles
+                           action:(void(^)(NSInteger index, NSString *actionTitle))actionBlock
 {
     if (itemTitles == nil || itemTitles.count == 0) return;
     

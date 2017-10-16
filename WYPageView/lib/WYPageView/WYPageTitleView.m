@@ -241,7 +241,7 @@ typedef struct {
     
     __block UIButton *lastView = nil;
     __block CGFloat itemTotalWidth = 0.0;
-    __block CGFloat itemW = 0;
+    __block CGFloat itemW = 0.0;
     if (!self.config.autoCalculateTitleItemWidth) {
         itemW = self.config.itemWidth;
     }
@@ -289,24 +289,37 @@ typedef struct {
         [self.itemArray addObject:button];
     }];
     
-    if (self.titles.count == 1) {
-        WYPageSingleTitleTextAlignment alignment = self.config.singleTitleAlignment;
-        if (alignment == WYPageSingleTitleTextAlignmentCenter) {
-            CGPoint center = lastView.center;
-            center.x = self.center.x;
-            lastView.center = center;
-        }
-        else if (alignment == WYPageSingleTitleTextAlignmentRight) {
-            CGRect frame = lastView.frame;
-            CGFloat x = CGRectGetWidth(self.mainView.frame) - firstX - frame.size.width;
-            frame.origin.x = x;
-            lastView.frame = frame;
-        }
-    }
     CGFloat contentW = CGRectGetMaxX(lastView.frame) + firstX;
     self.mainView.contentSize = CGSizeMake(contentW, 0);
+    
+    if (self.titles.count == 1) {
+        [self setupSingleTitleAlignment];
+    }
+    
     _itemsTotalWidth = itemTotalWidth;
+    
     return itemTotalWidth;
+}
+
+/**
+ 设置只有一个标题时的布局
+ */
+- (void)setupSingleTitleAlignment
+{
+    UIButton *firstItem = self.itemArray.firstObject;
+    WYPageSingleTitleTextAlignment alignment = self.config.singleTitleAlignment;
+    CGFloat firstX = self.config.titleEdgeItemDistanceOfView;
+    if (alignment == WYPageSingleTitleTextAlignmentCenter) {
+        CGPoint center = firstItem.center;
+        center.x = self.center.x;
+        firstItem.center = center;
+    }
+    else if (alignment == WYPageSingleTitleTextAlignmentRight) {
+        CGRect frame = firstItem.frame;
+        CGFloat x = CGRectGetWidth(self.mainView.frame) - firstX - frame.size.width;
+        frame.origin.x = x;
+        firstItem.frame = frame;
+    }
 }
 
 /**
@@ -333,12 +346,18 @@ typedef struct {
         if (cw <= 0) {
             cw = 0;
         }
-        
         _indicatorHeight = ch;
         _indicatorWidth = cw;
         
         self.indicatorView = view;
     }
+}
+- (void)setupMainViewContentSize
+{
+    UIButton *lastView = self.itemArray.lastObject;
+    CGFloat firstX = self.config.titleEdgeItemDistanceOfView;
+    CGFloat contentW = CGRectGetMaxX(lastView.frame) + firstX;
+    self.mainView.contentSize = CGSizeMake(contentW, 0);
 }
 - (void)layoutSubviews
 {
@@ -347,14 +366,24 @@ typedef struct {
 }
 - (void)resetLayout
 {
-    //1.设置frame
+    //0.设置frame
     self.mainView.frame = self.bounds;
-    //2.设置等距分布
+    
+    //1.设置等距分布
     if (self.config.equallySpaceWhenItemsWidthLessThanTitleWidth) {
         [self setupItemEquallySpaceWithItemTotalWidth:_itemsTotalWidth];
     }
+    else {
+        //2.计算contentSize
+        [self setupMainViewContentSize];
+    }
     //3.是否显示指示器
     BOOL showIndicator = self.indicatorStyle != WYPageTitleIndicatorViewStyleNone;
+    
+    if (self.itemArray.count == 1) {
+        [self setupSingleTitleAlignment];
+    }
+    
     //4.设置指示器view的frame
     if (showIndicator) {//显示指示器
         //设置指示器frame
@@ -396,25 +425,27 @@ typedef struct {
         }
     }
     // 4.创建标题 并计算按钮的总宽度
-    CGFloat itemTotalWidth = [self setupItemsWithItemHeight:itemH];
+    [self setupItemsWithItemHeight:itemH];
     
-    // 5.设置等距分布
+    //2.设置等距分布
     if (self.config.equallySpaceWhenItemsWidthLessThanTitleWidth) {
-        [self setupItemEquallySpaceWithItemTotalWidth:itemTotalWidth];
+        [self setupItemEquallySpaceWithItemTotalWidth:_itemsTotalWidth];
     }
-    // 6.是否显示指示器
+    
+    // 5.是否显示指示器
     BOOL showIndicator = self.indicatorStyle != WYPageTitleIndicatorViewStyleNone;
     
-    // 7.设置指示器view的frame
+    // 6.设置指示器view的frame
     if (showIndicator) {//显示指示器
         //设置指示器frame
         [self setupIndicatorViewFrameWithIndicatorW:_indicatorWidth];
     }
-    // 8.调整指示器的位置
+    
+    // 7.调整指示器的位置
     if (self.config.canZoomTitle && showIndicator) {// 如果缩放了字体并且显示指示器 重新调整指示器位置
         [self adjustIndicatorOrigin];
     }
-    // 9.设置默认背景颜色
+    // 8.设置默认背景颜色
     self.mainView.backgroundColor = self.config.titleViewBackgroundColor;
     self.backgroundColor = self.config.titleViewBackgroundColor;
 }
@@ -444,7 +475,7 @@ typedef struct {
 - (void)setupIndicatorViewFrameWithIndicatorW:(CGFloat)indicatorW
 {
     UIButton *currentItem = [self getItemWithIndex:_currentIndex];
-    CGFloat originX = 0;
+    CGFloat originX = 0.f;
     if (self.config.indicatorViewWidthEqualToItemWidth) {//指示器view与item宽度相同
         indicatorW = currentItem.frame.size.width;
         originX = currentItem.frame.origin.x;
@@ -464,7 +495,7 @@ typedef struct {
     if (position == WYPageTitleIndicatorViewPositionStyleTop) {//指示器在上面 y = 0
         indicatorY = 0;
     }
-    else if (position == WYPageTitleIndicatorViewPositionStyleBottom) {// 指示器view在下面
+    else if (position == WYPageTitleIndicatorViewPositionStyleBottom) {// 指示器在下面
         indicatorY = mainH - indicatorH;
     }
     else {// 指示器在中间
@@ -481,21 +512,38 @@ typedef struct {
  */
 - (void)setupItemEquallySpaceWithItemTotalWidth:(CGFloat)itemTotalWidth
 {
-    
+    if (self.itemArray.count <= 1) {
+        //0.只有一个标题时 直接返回
+        return;
+    }
+    // 1. 重新设置按钮之间的间隙
     CGFloat firstX = self.config.titleEdgeItemDistanceOfView;
     
-    CGFloat contentW = CGRectGetMaxX(self.itemArray.lastObject.frame) + firstX;
+    CGFloat contentW = itemTotalWidth + 2 * firstX;
     
     CGFloat mainW = CGRectGetWidth(self.mainView.frame);
     
     if (contentW < mainW) {
-        
+        //当按钮总宽度大于mainW 计算按钮之间的间隙
         CGFloat residue = mainW - itemTotalWidth - self.itemArray.firstObject.frame.origin.x - firstX;
         
         CGFloat margin = residue / (self.itemArray.count - 1);
         
         [self resetItemMargin:margin];
     }
+    else {
+        // 按钮的总宽度小于mainW时 按钮之间的间隙为config的titleMargin
+        [self resetItemMargin:self.config.titleMargin];
+    }
+    //2 设置contentSize
+    [self setupMainViewContentSize];
+    
+    //3 设置偏移 （比如在屏幕旋转中 由于当前按钮在横竖屏时显示位置不同 需要设置mainView的偏移量以让当前按钮显示在屏幕中）
+    if (contentW < mainW) {
+        return;
+    }
+    UIButton *sender = [self getItemWithIndex:_currentIndex];
+    [self configContentOffsetWithTargetBtn:sender];
 }
 - (void)setDataSource:(id<WYPageTitleViewDataSource>)dataSource
 {
@@ -510,11 +558,10 @@ typedef struct {
 }
 - (void)resetItemsHeight
 {
-    // 2.按钮的高度
+    // 1.按钮的高度
     CGFloat itemH = self.config.titleViewHeight;
-
+    // 2.y值
     CGFloat y = 0;
-    
     // 3.创建指示器
     if (_indicatorStyle != WYPageTitleIndicatorViewStyleNone) {
         
@@ -583,6 +630,7 @@ typedef struct {
     [self.itemArray enumerateObjectsUsingBlock:^(UIButton * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         CGRect frame = obj.frame;
         if (lastView == nil) {
+            frame.origin.x = self.config.titleEdgeItemDistanceOfView;
             obj.frame = frame;
         }
         else {
@@ -630,22 +678,9 @@ typedef struct {
     UIColor *selectColor = self.config.selectedTitleColor;
     [sender setTitleColor:selectColor forState:UIControlStateNormal];
     
-    
     //5.设置mainView的偏移量
-    //5.1 计算开始偏移的最小值
-    CGFloat paginationOrigin = self.mainView.frame.size.width * self.config.paginationScale;
+    [self configContentOffsetWithTargetBtn:sender];
     
-    //5.2 计算center
-    CGFloat centerX = sender.center.x;
-    
-    //5.3 判断是否应该偏移
-    if (centerX > paginationOrigin) {
-        CGFloat offset = centerX - paginationOrigin;
-        [self resetContentOffset:offset];
-    }
-    else {
-        [self resetContentOffset:0];
-    }
     //6.变化字体大小
     if (self.config.canZoomTitle) {
         CGFloat zoom = self.config.titleZoomMultiple;
@@ -653,7 +688,6 @@ typedef struct {
         if (animation) {
             animation = self.config.titleAnimationDuration > 0.0;
         }
-        
         if (animation) {
             [UIView animateWithDuration:self.config.titleAnimationDuration animations:^{
                 [self zoomTitleWithSender:oldBtn scale:1.0];
@@ -667,8 +701,6 @@ typedef struct {
             [self zoomTitleWithSender:sender scale:zoom];
         }
     }
-    
-    
     //7. 调整指示器位置
     if (_indicatorStyle != WYPageTitleIndicatorViewStyleNone) {
         BOOL animation = self.config.titleAnimationEnable;
@@ -801,12 +833,14 @@ typedef struct {
                               targetBtn:(UIButton *)targetBtn
 {
     // 1.获取滚动动画类型
-    WYIndicatorScrollAnimation scrollAnimation = self.config.indicatorViewScrollAnimation;
+    WYIndicatorScrollAnimation scrollAnimation = self.config.indicatorViewScrollAnimationWhenClickTitleItem;
 
     // 2.获取动画时间
     NSTimeInterval duration = self.config.titleAnimationDuration;
     
-    // 3. 有动画
+    // 3. 是否有动画
+    animation = animation ? scrollAnimation != WYIndicatorScrollAnimationNone : animation;
+    
     if (animation) {
         // 3.1 动画二
         if (scrollAnimation == WYIndicatorScrollAnimationValue2) {
@@ -938,7 +972,6 @@ typedef struct {
                                  sourceIndex:(NSInteger)sourceIndex
                                  targetIndex:(NSInteger)targetIndex
 {
-    
     UIButton *sourceBtn = [self getItemWithIndex:sourceIndex];
     UIButton *targetBtn = [self getItemWithIndex:targetIndex];
     
@@ -968,6 +1001,7 @@ typedef struct {
 #ifdef WYDEBUG
                 NSAssert(NO, @"当自定义指示器的滚动效果时、应当在'pageView'所在的控制器中实现'setCustomIndicatorViewScrollAnimation:progress:sourceIndex:targetIndex:'数据源方法");
 #endif
+                // 设置动画一类型
                 [self configIndicatorAnimationValue1WithProgress:progress sourceBtn:sourceBtn targetBtn:targetBtn];
             }
         }
@@ -1150,7 +1184,6 @@ typedef struct {
                              sourceBtn:(UIButton *)sourceBtn
                              targetBtn:(UIButton *)targetBtn
 {
-    
     //1 颜色变化范围
     WYRGBNumber colorRange = _colorRange;
     
@@ -1174,9 +1207,15 @@ typedef struct {
  */
 - (void)resetContentOffset:(CGFloat)offset
 {
-    CGFloat maxOffset = self.mainView.contentSize.width - self.mainView.frame.size.width;
-    
-    if (maxOffset < 0) return;
+    CGFloat contentSize = self.mainView.contentSize.width;
+    CGFloat mainW = CGRectGetWidth(self.mainView.frame);
+    if (contentSize < mainW) {
+        if (self.mainView.contentOffset.x != 0) {
+            [self.mainView setContentOffset:CGPointMake(0, 0) animated:YES];
+        }
+        return;
+    }
+    CGFloat maxOffset = contentSize - mainW;
     
     if (offset > maxOffset) {
         offset = maxOffset;
@@ -1207,7 +1246,7 @@ typedef struct {
         [_currentItem setTitleColor:self.config.selectedTitleColor forState:UIControlStateNormal];
     }
     //2.处理无动画的指示器样式
-    if (self.config.indicatorStyle != WYPageTitleIndicatorViewStyleNone) {//下划线样式
+    if (self.config.indicatorStyle != WYPageTitleIndicatorViewStyleNone) {
         if (self.config.indicatorViewScrollAnimation == WYIndicatorScrollAnimationNone) {
             [self resetIndicatorViewOriginWithSender:targetBtn];
         }
@@ -1229,7 +1268,6 @@ typedef struct {
     
     [self buttonAction:button];
 }
-
 
 /**
  获取对应下标位置的按钮

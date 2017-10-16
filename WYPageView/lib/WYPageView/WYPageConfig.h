@@ -111,9 +111,17 @@ typedef NS_ENUM(NSInteger, WYPageSingleTitleTextAlignment) {
 @property (nonatomic , assign) CGFloat indicatorViewWidth;
 
 /**
- 指示器的滚动效果 默认'WYIndicatorScrollAnimationValue1'
+ 指示器的滚动效果 默认'WYIndicatorScrollAnimationValue1' （只是指拖拽'contentView'时指示器的滚动效果）
  */
 @property (nonatomic , assign) WYIndicatorScrollAnimation indicatorViewScrollAnimation;
+
+/**
+ * 在点击按钮时 指示器的滚动效果类型 默认'WYIndicatorScrollAnimationValue1'
+ * 当为'WYIndicatorScrollAnimationNone'时 没有动画效果 指示器滚动跟'titleAnimationEnable'为'NO'时一样
+ * 当为'WYIndicatorScrollAnimationCustom'时 跟'WYIndicatorScrollAnimationValue1'效果一样
+ * ps: 一般点击按钮时的动画效果不会太复杂 如果想要自定义的话后续可以暴露相关接口
+ */
+@property (nonatomic , assign) WYIndicatorScrollAnimation indicatorViewScrollAnimationWhenClickTitleItem;
 
 /**
  标题之间的间隔 默认'15'

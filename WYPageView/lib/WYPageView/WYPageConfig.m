@@ -17,7 +17,7 @@
         
         self.indicatorPositionStyle = WYPageTitleIndicatorViewPositionStyleBottom;
         
-        self.indicatorViewHeight = 2;
+        self.indicatorViewHeight = 2.0;
         
         self.indicatorViewColor = [UIColor redColor];
         
@@ -27,9 +27,11 @@
         
         self.indicatorViewScrollAnimation = WYIndicatorScrollAnimationValue1;
         
+        self.indicatorViewScrollAnimationWhenClickTitleItem = WYIndicatorScrollAnimationValue1;
+        
         self.singleTitleAlignment = WYPageSingleTitleTextAlignmentLeft;
         
-        self.titleMargin = 15;
+        self.titleMargin = 15.0;
         
         self.titleFont = [UIFont systemFontOfSize:14];
         
@@ -53,7 +55,7 @@
         
         self.contentAnimationEnable = YES;
         
-        self.titleEdgeItemDistanceOfView = 15;
+        self.titleEdgeItemDistanceOfView = 15.0;
         
         self.titleViewBackgroundColor = [UIColor whiteColor];
         

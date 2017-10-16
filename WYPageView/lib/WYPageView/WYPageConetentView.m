@@ -176,6 +176,7 @@
     CGFloat offset = _currentIndex * CGRectGetWidth(self.scrollView.frame);
     
     //手动设置contentOffset会出发其代理方法 会导致手动设置index不准确 应该禁止其代理方法实现
+    _isForbidScrollDelegate = YES;
     self.scrollView.contentOffset = CGPointMake(offset, 0);
     
     //获取到当前的控制器 调整控制器view的frame

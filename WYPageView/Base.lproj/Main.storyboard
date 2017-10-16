@@ -248,6 +248,36 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="只有一个标题时按钮的位置" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KZ4-zs-utx">
+                                <rect key="frame" x="-1" y="523" width="181" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="73g-t1-1Fo">
+                                <rect key="frame" x="188" y="519" width="31" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="左边"/>
+                                <connections>
+                                    <action selector="chooseSingleTitleAlignment:" destination="BYZ-38-t0r" eventType="touchUpInside" id="vlY-VY-7zV"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="点击按钮时指示器的动画" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kAQ-5g-95f">
+                                <rect key="frame" x="1" y="558" width="191" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Eru-ee-plx">
+                                <rect key="frame" x="188" y="559" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="动画一"/>
+                                <connections>
+                                    <action selector="setIndicatorScrollStyleWhenClickTitle:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bge-Th-TnL"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.90384663205999305" green="0.91921733262128169" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                     </view>
@@ -276,6 +306,7 @@
                         <outlet property="paginationText" destination="Ms6-At-YPj" id="T75-mT-82U"/>
                         <outlet property="positionButton" destination="HMQ-Tx-u0W" id="xSx-Ix-rr8"/>
                         <outlet property="scrollAnimation" destination="fLa-WN-dzX" id="yOq-Qn-IKU"/>
+                        <outlet property="singleAlignmentButton" destination="73g-t1-1Fo" id="ERG-Oi-Ue0"/>
                         <outlet property="titleFontText" destination="DU4-6d-Lee" id="qAW-Go-YS8"/>
                         <outlet property="titleMarginText" destination="dYX-BW-Luf" id="q2Q-cO-esl"/>
                         <outlet property="titleViewHeightText" destination="NXk-zN-3Mi" id="gFg-qD-Pti"/>

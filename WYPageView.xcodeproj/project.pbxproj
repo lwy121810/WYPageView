@@ -8,7 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		9037DD329B60C1E8E632EA38 /* libPods-WYPageView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E766409E9BBFECAB279A4F7B /* libPods-WYPageView.a */; };
-		942E34771F6127CE002987A1 /* DemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E34761F6127CE002987A1 /* DemoViewController.m */; };
+		940F97FB1F949DAE00B64DEE /* DemoBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 940F97F51F949D7100B64DEE /* DemoBaseViewController.m */; };
+		940F97FC1F949DAE00B64DEE /* DemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 940F97F81F949D7100B64DEE /* DemoViewController.m */; };
+		940F97FD1F949DB500B64DEE /* NavViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 940F97FA1F949D7100B64DEE /* NavViewController.m */; };
 		942E348A1F612C19002987A1 /* FiveViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E347A1F612C19002987A1 /* FiveViewController.m */; };
 		942E348B1F612C19002987A1 /* FiveViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 942E347B1F612C19002987A1 /* FiveViewController.xib */; };
 		942E348C1F612C19002987A1 /* FourViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 942E347D1F612C19002987A1 /* FourViewController.m */; };
@@ -25,7 +27,6 @@
 		945FF6291F628C1F007C0B51 /* lwy3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 945FF6271F628C1F007C0B51 /* lwy3.jpg */; };
 		945FF62A1F628C1F007C0B51 /* lwy2.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 945FF6281F628C1F007C0B51 /* lwy2.jpeg */; };
 		945FF62C1F628EA2007C0B51 /* lwy4.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 945FF62B1F628EA2007C0B51 /* lwy4.jpeg */; };
-		948ABE651F7DD42600E7CB0F /* NavViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 948ABE631F7DD42600E7CB0F /* NavViewController.m */; };
 		94A3389E1F41411E00958421 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 94A3389D1F41411E00958421 /* main.m */; };
 		94A338A11F41411E00958421 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 94A338A01F41411E00958421 /* AppDelegate.m */; };
 		94A338A41F41411E00958421 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 94A338A31F41411E00958421 /* ViewController.m */; };
@@ -46,7 +47,6 @@
 		94C7DF0C1F7A02B20000259D /* WYPageConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 94C7DF051F7A02120000259D /* WYPageConfig.m */; };
 		94C7DF0D1F7A02B20000259D /* WYPageTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 94C7DF0A1F7A02130000259D /* WYPageTitleView.m */; };
 		94C7DF0E1F7A02B20000259D /* WYPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 94C7DF071F7A02130000259D /* WYPageView.m */; };
-		94E14F851F7DF630008C6C16 /* DemoBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 94E14F841F7DF630008C6C16 /* DemoBaseViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,8 +69,14 @@
 /* Begin PBXFileReference section */
 		1BA27B328257339CD88EFBEB /* Pods-WYPageView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WYPageView.release.xcconfig"; path = "Pods/Target Support Files/Pods-WYPageView/Pods-WYPageView.release.xcconfig"; sourceTree = "<group>"; };
 		3ED3227C612FA79142E95DC2 /* Pods-WYPageView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WYPageView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-WYPageView/Pods-WYPageView.debug.xcconfig"; sourceTree = "<group>"; };
-		942E34751F6127CE002987A1 /* DemoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoViewController.h; path = CLAlertController/DemoViewController.h; sourceTree = "<group>"; };
-		942E34761F6127CE002987A1 /* DemoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DemoViewController.m; path = CLAlertController/DemoViewController.m; sourceTree = "<group>"; };
+		940F97F41F949D7100B64DEE /* DemoBaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoBaseViewController.h; sourceTree = "<group>"; };
+		940F97F51F949D7100B64DEE /* DemoBaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoBaseViewController.m; sourceTree = "<group>"; };
+		940F97F71F949D7100B64DEE /* DemoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoViewController.h; sourceTree = "<group>"; };
+		940F97F81F949D7100B64DEE /* DemoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoViewController.m; sourceTree = "<group>"; };
+		940F97F91F949D7100B64DEE /* NavViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NavViewController.h; sourceTree = "<group>"; };
+		940F97FA1F949D7100B64DEE /* NavViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NavViewController.m; sourceTree = "<group>"; };
+		940F98001F949F7700B64DEE /* iOS11-屏幕旋转.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "iOS11-屏幕旋转.gif"; sourceTree = "<group>"; };
+		940F98011F949F7700B64DEE /* 效果图.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "效果图.gif"; sourceTree = "<group>"; };
 		942E34791F612C19002987A1 /* FiveViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FiveViewController.h; sourceTree = "<group>"; };
 		942E347A1F612C19002987A1 /* FiveViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FiveViewController.m; sourceTree = "<group>"; };
 		942E347B1F612C19002987A1 /* FiveViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FiveViewController.xib; sourceTree = "<group>"; };
@@ -93,8 +99,6 @@
 		945FF6271F628C1F007C0B51 /* lwy3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = lwy3.jpg; sourceTree = "<group>"; };
 		945FF6281F628C1F007C0B51 /* lwy2.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = lwy2.jpeg; sourceTree = "<group>"; };
 		945FF62B1F628EA2007C0B51 /* lwy4.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = lwy4.jpeg; sourceTree = "<group>"; };
-		948ABE621F7DD42600E7CB0F /* NavViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NavViewController.h; sourceTree = "<group>"; };
-		948ABE631F7DD42600E7CB0F /* NavViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NavViewController.m; sourceTree = "<group>"; };
 		94A338991F41411E00958421 /* WYPageView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WYPageView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		94A3389D1F41411E00958421 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		94A3389F1F41411E00958421 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -135,8 +139,6 @@
 		94C7DF081F7A02130000259D /* WYPageConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WYPageConfig.h; sourceTree = "<group>"; };
 		94C7DF091F7A02130000259D /* WYPageConetentView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYPageConetentView.m; sourceTree = "<group>"; };
 		94C7DF0A1F7A02130000259D /* WYPageTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WYPageTitleView.m; sourceTree = "<group>"; };
-		94E14F831F7DF630008C6C16 /* DemoBaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoBaseViewController.h; sourceTree = "<group>"; };
-		94E14F841F7DF630008C6C16 /* DemoBaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoBaseViewController.m; sourceTree = "<group>"; };
 		E766409E9BBFECAB279A4F7B /* libPods-WYPageView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WYPageView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -181,6 +183,52 @@
 				E766409E9BBFECAB279A4F7B /* libPods-WYPageView.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		940F97F21F949D7100B64DEE /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				940F97F61F949D7100B64DEE /* DemoVc */,
+				940F97F31F949D7100B64DEE /* Base */,
+			);
+			path = Demo;
+			sourceTree = "<group>";
+		};
+		940F97F31F949D7100B64DEE /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				940F97F41F949D7100B64DEE /* DemoBaseViewController.h */,
+				940F97F51F949D7100B64DEE /* DemoBaseViewController.m */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		940F97F61F949D7100B64DEE /* DemoVc */ = {
+			isa = PBXGroup;
+			children = (
+				940F97F71F949D7100B64DEE /* DemoViewController.h */,
+				940F97F81F949D7100B64DEE /* DemoViewController.m */,
+				940F97FE1F949DC700B64DEE /* 分开使用 */,
+			);
+			path = DemoVc;
+			sourceTree = "<group>";
+		};
+		940F97FE1F949DC700B64DEE /* 分开使用 */ = {
+			isa = PBXGroup;
+			children = (
+				940F97F91F949D7100B64DEE /* NavViewController.h */,
+				940F97FA1F949D7100B64DEE /* NavViewController.m */,
+			);
+			path = "分开使用";
+			sourceTree = "<group>";
+		};
+		940F97FF1F949F7700B64DEE /* Image */ = {
+			isa = PBXGroup;
+			children = (
+				940F98001F949F7700B64DEE /* iOS11-屏幕旋转.gif */,
+				940F98011F949F7700B64DEE /* 效果图.gif */,
+			);
+			path = Image;
 			sourceTree = "<group>";
 		};
 		942E34781F612C19002987A1 /* TestVc */ = {
@@ -237,6 +285,7 @@
 		94A338901F41411E00958421 = {
 			isa = PBXGroup;
 			children = (
+				940F97FF1F949F7700B64DEE /* Image */,
 				94A3389B1F41411E00958421 /* WYPageView */,
 				94A338B51F41411E00958421 /* WYPageViewTests */,
 				94A338C01F41411E00958421 /* WYPageViewUITests */,
@@ -265,12 +314,7 @@
 				94A338A01F41411E00958421 /* AppDelegate.m */,
 				94A338A21F41411E00958421 /* ViewController.h */,
 				94A338A31F41411E00958421 /* ViewController.m */,
-				942E34751F6127CE002987A1 /* DemoViewController.h */,
-				942E34761F6127CE002987A1 /* DemoViewController.m */,
-				948ABE621F7DD42600E7CB0F /* NavViewController.h */,
-				948ABE631F7DD42600E7CB0F /* NavViewController.m */,
-				94E14F831F7DF630008C6C16 /* DemoBaseViewController.h */,
-				94E14F841F7DF630008C6C16 /* DemoBaseViewController.m */,
+				940F97F21F949D7100B64DEE /* Demo */,
 				942E34781F612C19002987A1 /* TestVc */,
 				94BDC8D11F5FED410073A97D /* CLAlertController */,
 				94A338A51F41411E00958421 /* Main.storyboard */,
@@ -535,9 +579,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				940F97FD1F949DB500B64DEE /* NavViewController.m in Sources */,
+				940F97FB1F949DAE00B64DEE /* DemoBaseViewController.m in Sources */,
+				940F97FC1F949DAE00B64DEE /* DemoViewController.m in Sources */,
 				94C7DF0B1F7A02B20000259D /* WYPageConetentView.m in Sources */,
 				94C7DF0C1F7A02B20000259D /* WYPageConfig.m in Sources */,
-				948ABE651F7DD42600E7CB0F /* NavViewController.m in Sources */,
 				94C7DF0D1F7A02B20000259D /* WYPageTitleView.m in Sources */,
 				94C7DF0E1F7A02B20000259D /* WYPageView.m in Sources */,
 				942E348A1F612C19002987A1 /* FiveViewController.m in Sources */,
@@ -553,12 +599,10 @@
 				94A338A11F41411E00958421 /* AppDelegate.m in Sources */,
 				942E34911F612C19002987A1 /* ThreeViewController.m in Sources */,
 				94BDC8E21F5FED410073A97D /* CLAlertCancelTableViewCell.m in Sources */,
-				94E14F851F7DF630008C6C16 /* DemoBaseViewController.m in Sources */,
 				942E348F1F612C19002987A1 /* SixViewController.m in Sources */,
 				94A3389E1F41411E00958421 /* main.m in Sources */,
 				942E34931F612C19002987A1 /* TwoViewController.m in Sources */,
 				942E348C1F612C19002987A1 /* FourViewController.m in Sources */,
-				942E34771F6127CE002987A1 /* DemoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
