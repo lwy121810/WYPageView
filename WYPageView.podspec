@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
     s.name         = 'WYPageView'
-    s.version      = '1.0.3'
+    s.version      = '1.1.0'
     s.summary      = '一个简单的滚动视图封装'
     s.homepage     = 'https://github.com/lwy121810/WYPageView'
     s.license      = 'MIT'
