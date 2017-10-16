@@ -3,7 +3,7 @@
 ## 安装
 **pod**
  
- > pod 'WYPageView', '~> 1.0.3'
+ > pod 'WYPageView', '~> 1.1.0'
      
 **手动**
 
@@ -61,7 +61,10 @@
  
 ![效果图](https://github.com/lwy121810/WYPageView/blob/master/Image/效果图.gif)
 
+![效果图2](https://github.com/lwy121810/WYPageView/blob/master/Image/iOS11-屏幕旋转.gif)
+
  ## 更新
+  * 2017-10-16 支持屏幕旋转 更新pod版本为'1.1.0'
   * 2017-8-29 初始化不再必须传frame 支持ios 11 更新pod版本为'1.0.3'
   * 2017-8-9: 上传新版本（使用scrollView替代collectionView，新增多种自定义效果）
   
