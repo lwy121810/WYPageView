@@ -211,13 +211,13 @@
     NSArray *childVcs = [NSArray arrayWithObjects:vc1, vc2, vc3, vc4, vc5, vc6, vc7,vc8,nil];
     return childVcs;
 }
-
+#pragma mark - 设置随机数量的vc
 - (void)randomReloadAction
 {
     NSMutableArray *vcs = [NSMutableArray array];
     NSMutableArray *titles = [NSMutableArray array];
     
-    NSInteger count = arc4random() % 8 + 3;
+    NSInteger count = arc4random() % 8 + 5;
 
     for (int i = 0; i < count; i++) {
         UIViewController *contentVc = [[UIViewController alloc] init];

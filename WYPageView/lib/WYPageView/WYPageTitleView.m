@@ -369,14 +369,17 @@ typedef struct {
     //0.设置frame
     self.mainView.frame = self.bounds;
     
-    //1.设置等距分布
+    //1.计算contentSize
+    [self setupMainViewContentSize];
+    
+    //2.设置等距分布
     if (self.config.equallySpaceWhenItemsWidthLessThanTitleWidth) {
         [self setupItemEquallySpaceWithItemTotalWidth:_itemsTotalWidth];
     }
     else {
-        //2.计算contentSize
-        [self setupMainViewContentSize];
+        [self setupCurrentItemPosition];
     }
+    
     //3.是否显示指示器
     BOOL showIndicator = self.indicatorStyle != WYPageTitleIndicatorViewStyleNone;
     
@@ -542,6 +545,10 @@ typedef struct {
     if (contentW < mainW) {
         return;
     }
+    [self setupCurrentItemPosition];
+}
+- (void)setupCurrentItemPosition
+{
     UIButton *sender = [self getItemWithIndex:_currentIndex];
     [self configContentOffsetWithTargetBtn:sender];
 }
