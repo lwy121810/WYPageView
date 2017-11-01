@@ -20,10 +20,8 @@
     // Do any additional setup after loading the view from its nib.
     //
     
-    NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
-    NSString *iconPath = [resourcePath stringByAppendingPathComponent:@"lwy3.jpg"];
-    UIImage *icon = [UIImage imageWithContentsOfFile:iconPath];
-    self.iconView.image = icon;
+    
+    self.iconView.image = kLocalImage(@"lwy3.jpg");
 }
 
 - (void)dealloc

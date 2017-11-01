@@ -41,11 +41,7 @@ static NSString *kIdentifier = @"kTest";
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
-    
-    NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
-    NSString *iconPath = [resourcePath stringByAppendingPathComponent:@"lwy4.jpeg"];
-    UIImage *icon = [UIImage imageWithContentsOfFile:iconPath];
-    self.iconView.image = icon;
+    self.iconView.image = kLocalImage(@"lwy4.jpeg");
     
     self.tableView.backgroundColor = [UIColor clearColor];
 }

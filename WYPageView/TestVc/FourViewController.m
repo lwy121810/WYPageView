@@ -31,10 +31,7 @@ static NSString *kCellId = @"UITableViewCell";
     self.tableView.backgroundColor = [UIColor clearColor];
     
     
-    NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
-    NSString *iconPath = [resourcePath stringByAppendingPathComponent:@"lwy2.jpeg"];
-    UIImage *icon = [UIImage imageWithContentsOfFile:iconPath];
-    self.iconView.image = icon;
+    self.iconView.image = kLocalImage(@"lwy2.jpeg");
 }
 
 

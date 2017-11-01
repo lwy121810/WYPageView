@@ -308,13 +308,6 @@
     [self titleView];
     self.contentView.backgroundColor = [UIColor whiteColor];
 }
-
-- (void)setFrame:(CGRect)frame
-{
-    [super setFrame:frame];
-    
-}
-
 - (void)layoutSubviews
 {
     [super layoutSubviews];
@@ -327,13 +320,10 @@
     CGRect headerFrame = CGRectMake(0, 0, self.bounds.size.width, headerH);
     self.titleView.frame = headerFrame;
     
-    self.titleView.backgroundColor = [UIColor redColor];
-    
     CGFloat contentY = CGRectGetMaxY(self.titleView.frame);
     CGFloat contentH = self.frame.size.height - contentY;
     CGRect frame = CGRectMake(0, contentY, self.frame.size.width, contentH);
     self.contentView.frame = frame;
-    self.contentView.backgroundColor = [UIColor blueColor];
 }
 - (void)setCurrentSelectedIndex:(NSInteger)currentSelectedIndex
 {

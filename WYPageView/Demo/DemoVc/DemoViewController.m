@@ -25,7 +25,7 @@
 #define VIEWSAFEAREAINSETS(view) ({UIEdgeInsets i; if(@available(iOS 11.0, *)) {i = view.safeAreaInsets;} else {i = UIEdgeInsetsZero;} i;})
 
 
-@interface DemoViewController ()<WYPageTitleViewDataSource>
+@interface DemoViewController ()<WYPageTitleViewDataSource, WYPageTitleViewDelegate>
 
 @property (nonatomic , strong) WYPageView *pageView;
 @end
@@ -59,28 +59,29 @@
     
     self.pageView = page;
     if (@available(iOS 11.0, *)) {
-        // ios 11之后在‘viewSafeAreaInsetsDidChange’方法里根据‘safeAreaInsets’赋值frame
+        // 在‘viewSafeAreaInsetsDidChange’方法里根据‘safeAreaInsets’赋值frame
     } else {
         // Fallback on earlier versions
         self.pageView.frame = frame;
     }
     
     [self setupBarItems];
+    
+    // 如果想监测titleView按钮的点击事件 可以通过代理的方法
+    self.pageView.titleView.delegate = self;
 }
-
+#pragma mark - 按钮点击事件的代理
+- (void)pageTitleView:(WYPageTitleView *)pageTitleView selectdIndexItem:(NSInteger)selectdIndex oldIndex:(NSInteger)oldIndex
+{
+    NSLog(@"selectdIndex： %ld  oldIndex： %ld", selectdIndex, oldIndex);
+}
 //适配iOS 11
 //- (void)viewSafeAreaInsetsDidChange在UIViewController中第一次调用的时间是在- (void)viewWillAppear:(BOOL)animated调用之后, 在- (void)viewWillLayoutSubviews调用之前.
 // 旋转屏幕之后也会调用该方法
 - (void)viewSafeAreaInsetsDidChange
 {
     [super viewSafeAreaInsetsDidChange];
-    UIEdgeInsets safeAreaInsets =  self.view.safeAreaInsets;
-    CGRect frame = self.view.frame;
-    frame.origin.x = safeAreaInsets.left;
-    frame.origin.y = safeAreaInsets.top;
-    frame.size.width -= safeAreaInsets.left + safeAreaInsets.right;
-    frame.size.height -= safeAreaInsets.top + safeAreaInsets.bottom;
-    self.pageView.frame = frame;
+    [self setupFullFrameWithView:self.pageView];
 }
 - (void)setupBarItems
 {
@@ -226,7 +227,9 @@
         contentVc.view.backgroundColor = [self randomColor];
         [titles addObject:title];
     }
-    
+    // 在relaod之前 可以通过获取到config 修改对应的值 来重新设置基本信息
+//    WYPageConfig *config = self.pageView.config;
+//    config.titleMargin = 20;
     [self.pageView reloadChildrenControllers:vcs titles:titles];
 }
 

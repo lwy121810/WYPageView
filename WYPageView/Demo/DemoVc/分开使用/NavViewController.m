@@ -89,6 +89,7 @@
     titleView.delegate = self;
     self.titleView = titleView;
     // 可以通过titleView获取到指示器view 从而可以自由的更改指示器view的颜色、圆角等等属性
+    // 设置指示器view的背景颜色
 //    titleView.indicatorView.backgroundColor = [UIColor greenColor];
 }
 - (void)viewWillAppear:(BOOL)animated
@@ -99,14 +100,8 @@
 - (void)viewSafeAreaInsetsDidChange
 {
     [super viewSafeAreaInsetsDidChange];
-    UIEdgeInsets safe = self.view.safeAreaInsets;
-
-    CGRect frame = self.view.frame;
-    frame.origin.x = safe.left;
-    frame.origin.y = safe.top;
-    frame.size.width -= safe.left + safe.right;
-    frame.size.height -= safe.top + safe.bottom;
-    self.contentView.frame = frame;
+    
+    [self setupFullFrameWithView:self.contentView];
 }
 #pragma mark - WYPageTitleViewDataSource
 // 实现该方法 自定义指示器样式
