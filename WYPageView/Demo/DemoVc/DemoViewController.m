@@ -25,8 +25,8 @@
 #define VIEWSAFEAREAINSETS(view) ({UIEdgeInsets i; if(@available(iOS 11.0, *)) {i = view.safeAreaInsets;} else {i = UIEdgeInsetsZero;} i;})
 
 
-@interface DemoViewController ()<WYPageTitleViewDataSource, WYPageTitleViewDelegate>
-
+@interface DemoViewController ()<WYPageTitleViewDataSource>
+ 
 @property (nonatomic , strong) WYPageView *pageView;
 @end
 
@@ -66,15 +66,8 @@
     }
     
     [self setupBarItems];
-    
-    // 如果想监测titleView按钮的点击事件 可以通过代理的方法
-    self.pageView.titleView.delegate = self;
 }
-#pragma mark - 按钮点击事件的代理
-- (void)pageTitleView:(WYPageTitleView *)pageTitleView selectdIndexItem:(NSInteger)selectdIndex oldIndex:(NSInteger)oldIndex
-{
-    NSLog(@"selectdIndex： %ld  oldIndex： %ld", selectdIndex, oldIndex);
-}
+
 //适配iOS 11
 //- (void)viewSafeAreaInsetsDidChange在UIViewController中第一次调用的时间是在- (void)viewWillAppear:(BOOL)animated调用之后, 在- (void)viewWillLayoutSubviews调用之前.
 // 旋转屏幕之后也会调用该方法
@@ -122,8 +115,7 @@
     vc4.title = @"vc4";
     
     __weak typeof(self)weakSelf = self;
-    vc4.selectedIndex = ^(NSInteger index) {
-        //我在vc4里手动将selectedIndex置为nil 所以这里可以直接使用self
+    vc4.fourVcSelectedIndex = ^(NSInteger index) {
         weakSelf.pageView.currentSelectedIndex = index;
     };
     [childs addObject:vc4];
@@ -261,7 +253,7 @@
     vc4.title = @"vc4";
     
     __weak typeof(self)weakSelf = self;
-    vc4.selectedIndex = ^(NSInteger index) {
+    vc4.fourVcSelectedIndex = ^(NSInteger index) {
         weakSelf.pageView.currentSelectedIndex = index;
     };
     

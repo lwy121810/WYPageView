@@ -63,7 +63,7 @@ static NSString *kCellId = @"UITableViewCell";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellId];
-    NSString *text = [NSString stringWithFormat:@"点我跳转到对应的子控制器 --  %ld", indexPath.row + 1];
+    NSString *text = [NSString stringWithFormat:@"点我跳转到对应下标的子控制器 --  %ld", indexPath.row];
     cell.textLabel.text = text;
     cell.textLabel.textColor = [UIColor redColor];
     cell.contentView.backgroundColor = [UIColor clearColor];
@@ -76,8 +76,8 @@ static NSString *kCellId = @"UITableViewCell";
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.selectedIndex) {
-        self.selectedIndex(indexPath.row);
+    if (self.fourVcSelectedIndex) {
+        self.fourVcSelectedIndex(indexPath.row);
     }
 }
 @end

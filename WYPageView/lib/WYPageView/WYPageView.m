@@ -327,16 +327,22 @@
 }
 - (void)setCurrentSelectedIndex:(NSInteger)currentSelectedIndex
 {
-    if (_currentSelectedIndex == currentSelectedIndex) return;
+    if (_currentSelectedIndex == currentSelectedIndex) {
+        WYLog(@">>>>>>>>>>>>>点击的是当前页面");
+        return;
+    };
     if (self.childVcs == nil || self.childVcs.count == 0 || self.titlesArray == nil || self.titlesArray.count == 0) {
+        WYLog(@">>>>>>>>>>>>>当前子控制器数组长度为0");
         return;
     }
     
     if (currentSelectedIndex < 0) {
         currentSelectedIndex = 0;
+        WYLog(@">>>>>>>>>>>>>当前下标小于0了 自动修改为0");
     }
     if (currentSelectedIndex > self.childVcs.count - 1) {
         currentSelectedIndex = self.childVcs.count - 1;
+        WYLog(@">>>>>>>>>>>>>当前下标大于数组长度了 自动修改为最大值");
     }
     _currentSelectedIndex = currentSelectedIndex;
     

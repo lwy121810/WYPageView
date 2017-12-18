@@ -8,5 +8,5 @@
 
 #import <UIKit/UIKit.h>
 @interface FourViewController : UIViewController
-@property (nonatomic , copy) void(^selectedIndex)(NSInteger index);
+@property (nonatomic , copy) void(^fourVcSelectedIndex)(NSInteger index);
 @end

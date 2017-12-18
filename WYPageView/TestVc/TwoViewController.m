@@ -71,7 +71,7 @@
     vc4.title = @"vc4";
     
     __weak typeof(self)weakSelf = self;
-    vc4.selectedIndex = ^(NSInteger index) {
+    vc4.fourVcSelectedIndex = ^(NSInteger index) {
         weakSelf.pageView.currentSelectedIndex = index;
     };
     
